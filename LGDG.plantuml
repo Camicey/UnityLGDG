@@ -1,0 +1,70 @@
+@startuml DiagrammeUML
+class Joueur
+class Carte
+class Jeu
+class Terrain
+
+Joueur -- Terrain : < est associé à 1
+Joueur - Jeu : > participe à 1
+Carte - Joueur : < possède 0..n
+Carte - Jeu : > compose n..m
+
+class Joueur {
+    Id : int
+    Prenom : string
+    Email : string
+    List <> Deck : List<Carte>
+    TerrainJoueur : Terrain
+    Connecte : bool
+}
+
+class Terrain {
+    Id : int
+    ImageTerre : sprite
+}
+
+
+class Jeu {
+    Id : int
+    ImageTerre : sprite
+    Joueur1 : Joueur
+    Joueur2 : Joueur
+    List<> Pioche : List<Carte>
+    List<> Defausse : List<Carte>
+
+    ChangerDeJoueur()
+    ChoisirFamille()
+    ChoixStratege()
+    DebutDeJeu()
+    InitialiserCartes() 
+}
+
+
+class Carte {
+    Id : int
+    Prenom : string
+    Appartenance : Joueur
+    PM : int
+    PV : int
+    PA : int
+    Type : string
+    Famille : string
+    IdPouvoir : int
+    CoutPouvoir : int
+    List <> Liens : List<Carte>
+    Image : sprite
+    EstCachee : bool
+    EstEnJeu : bool
+
+    ActiverPouvoir(IdPouvoir, CoutPouvoir)
+    Attaquer(CarteVisee)
+    Echanger(CarteEchange)
+    Mourir()
+    Poser(Case)
+    Retirer()
+    Retourner()
+    SeDeplacer(CaseDepart, CaseArrivee)
+
+}
+
+@enduml
