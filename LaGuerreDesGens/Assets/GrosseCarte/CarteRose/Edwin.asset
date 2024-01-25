@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b70c9607f7b72247a6d82db0e9f745b, type: 3}
+  m_Name: Edwin
+  m_EditorClassIdentifier: 
+  Id: 26
+  Prenom: Edwin
+  Image: {fileID: 21300000, guid: ff6b9d1eef441584d961ca9a1b031075, type: 3}
+  PM: 1
+  PV: 25
+  PVar: 25
+  PA: 10
+  Pouvoir: Echange deux cartes.
+  CoutPouvoir: 1
+  Famille: Rose
+  FamilleImage: {fileID: 21300000, guid: be93a18f5969f134f8c34efa8554bec9, type: 3}
+  Type: Neutre
+  TypeImage: {fileID: 21300000, guid: e3315a9042f95e04981640b352388178, type: 3}
+  liens:
+  - {fileID: 11400000, guid: d7f2a8934d1e40848a7537a0727db3dd, type: 2}
+  - {fileID: 11400000, guid: db40935cd1097f94c8fd1ed7a61e0dda, type: 2}
+  - {fileID: 11400000, guid: f9156b4714ace3d4192e6307766cf215, type: 2}
+  - {fileID: 11400000, guid: b2b99832e579ac34480099cc9fe55ce8, type: 2}

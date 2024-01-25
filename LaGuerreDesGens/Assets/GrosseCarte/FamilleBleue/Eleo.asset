@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b70c9607f7b72247a6d82db0e9f745b, type: 3}
+  m_Name: Eleo
+  m_EditorClassIdentifier: 
+  Id: 51
+  Prenom: Eleo
+  Image: {fileID: 21300000, guid: 43e0e28f85618924bb11926037cb37ee, type: 3}
+  PM: 3
+  PV: 20
+  PVar: 20
+  PA: 20
+  Pouvoir: Immobilise un personnage mais perd 10 PV
+  CoutPouvoir: 1
+  Famille: Bleue
+  FamilleImage: {fileID: 21300000, guid: 9d8a533f149825449b17d38b2b8de220, type: 3}
+  Type: Defenseur
+  TypeImage: {fileID: 21300000, guid: d9c1c05dba029894a852a8232e27c84c, type: 3}
+  liens:
+  - {fileID: 11400000, guid: bdbf62f4893be1e40835e4cfeb14217e, type: 2}
+  - {fileID: 11400000, guid: 7ae07011262be0e40863b3a65a876c97, type: 2}
