@@ -22,16 +22,18 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public int IdPouvoir;
     public float CoutPouvoir;
     public List<Carte> Liens = new List<Carte>();
-    public bool EstCachee = false;
-    public bool EstMontree = false;
-    public bool EstEnJeu = false;
+    public bool EstCachee = false; //Est cachée à l'adversaire
+    public bool EstMontree = false; //Est montrée sur la grande carte
+    public bool EstEnJeu = false; //Est sur le plateau
     public bool Stratege = false;
 
-    //public Joueur Appartenance;
+    public Joueur Appartenance;
     public Vector2 PositionBase;
     public GameManager JeuEnCours;
     public PlaceDeck PlaceOccupee;
     public PlaceTerrain PlaceTerrainOccupee;
+    public Sprite ImageOriginale;
+
 
     // Start is called before the first frame update
     void Start()
@@ -40,16 +42,8 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         canvasGroup = GetComponent<CanvasGroup>();
         PositionBase = rectTransform.anchoredPosition;
     }
-    /*
-        public void Retirer()
-        {
-            EstEnJeu = false;
-            EstCachee = false;
-            //carteAssocie.SeDecaler(false);
-            //jeuEnCours.Retire(this);
-        }
-    */
-    public void Agrandir()
+
+    public void Agrandir() // Agrandir la carte.
     {
         if (EstEnJeu == false)
         {
@@ -112,18 +106,18 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         else
         {
             PlaceOccupee.availableCarteSlots = true;
+            PlaceOccupee.CartePlacee = null;
             PlaceOccupee = null;
+
         }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log("OnPointerDown");
-
-
-        if (EstEnJeu == true) // && EstMontree == false
+        if (EstEnJeu == true && (EstCachee == false || JeuEnCours.JoueurActif == Appartenance)) // 
         {
-            if (JeuEnCours.CarteMontreeEnCours == false)
+
+            if (JeuEnCours.CarteMontreeEnCours == false) //Je montre une carte
             {
                 JeuEnCours.grosseCarte.SeDecaler(ChercherCarte(), true);
                 //jeuEnCours.EnleverBouton();
@@ -139,6 +133,10 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
             EstMontree = !EstMontree;
             JeuEnCours.CarteMontreeEnCours = EstMontree;
             Debug.Log("Une carte est montrée :" + JeuEnCours.CarteMontreeEnCours);
+        }
+        else
+        {
+            Debug.Log("Vous ne pouvez pas voir cette carte.");
         }
         /*
             if (JeuEnCours.EstEnTrainDeChoisirStratège == true && EstEnJeu == false)

@@ -6,7 +6,7 @@ public class PlaceDeck : MonoBehaviour
 {
     public GameManager JeuEnCours;
     public Joueur JoueurAppartenance;
-    public bool availableCarteSlots = true;
+    public bool availableCarteSlots;
     public Carte CartePlacee = null;
     public RectTransform rectTransform;
 

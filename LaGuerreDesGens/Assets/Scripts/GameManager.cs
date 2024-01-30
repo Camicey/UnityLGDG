@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,29 +11,34 @@ public class GameManager : MonoBehaviour
     public Joueur J1;
     public Joueur J2;
     public Joueur JoueurActif;
-    public Joueur JoueurPassif;
+    protected Joueur JoueurPassif;
     public int Tour { get; set; }
+    protected float PMEnCours;
     public List<PlaceDeck> SlotsCartes = new List<PlaceDeck>();
     public List<CarteSettings> CartesMontrable = new List<CarteSettings>();
     public GrosseCarte grosseCarte;
     public bool CarteMontreeEnCours = false;
     public bool EstEnTrainDeChoisirStratège = false;
+    public Sprite ImageDosCarte;
+    public Text ActionEnCoursTexte;
 
     //public List<BoutonCache> BoutonsDerriere = new List<BoutonCache>();
 
+    public GameObject FondColore;
 
     void Start()
     {
         //Demander les infos des joueurs
         //Demander quelles familles ils veulent jouer
-        NouvellePartie(); //Normalement on aura des choix donc il changera de place
+        //NouvellePartie(); //Normalement on aura des choix donc il changera de place
+
     }
 
-    protected void NouvellePartie() // On récupèrera les joueurs et familles
+    public void NouvellePartie() // On récupèrera les joueurs et familles
     {
         JoueurActif = J1; //Ce sera une création de joueur à la place
         JoueurPassif = J2;
-        Tour = 1;
+        Tour = -1;
         foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
         {
             slot.gameObject.SetActive(true);
@@ -46,8 +52,9 @@ public class GameManager : MonoBehaviour
         foreach (Carte carte in Pioche) //Ca donne les endroits du deck pour le jeu
         {
             carte.PlaceOccupee = PlacePioche;
+            carte.Appartenance = null;
         }
-
+        //Virer toutes les cartes des decks
         // Mettre toutes les cartes choisies dans
         /*
         foreach(carte in carteSettings TOTALE)
@@ -62,11 +69,25 @@ public class GameManager : MonoBehaviour
         }
         */
 
+        // La, on pioche les cartes du tout début de partie
+        for (int i = 0; i < 4; i++)
+        {
+            Piocher();
+            JoueurActif.APioche = false;
+        }
+        ChangerDeTour();
+        for (int i = 0; i < 4; i++)
+        {
+            Piocher();
+            JoueurActif.APioche = false;
+        }
+        ChangerDeTour();
+
     }
 
     public void Piocher()
     {
-        if (Pioche.Count >= 1)
+        if (Pioche.Count >= 1 && JoueurActif.APioche == false)
         {
             Carte randCarte = Pioche[Random.Range(0, Pioche.Count)];
 
@@ -80,8 +101,10 @@ public class GameManager : MonoBehaviour
                     slot.CartePlacee = randCarte;
                     randCarte.PositionBase = slot.rectTransform.anchoredPosition;
                     randCarte.PlaceOccupee = slot;
+                    randCarte.Appartenance = JoueurActif;
                     Pioche.Remove(randCarte);
                     JoueurActif.CartesPossedees.Add(randCarte);
+                    JoueurActif.APioche = true;
                     return;
                 }
             }
@@ -93,6 +116,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("On change de tour : " + Tour);
         Debug.Log(JoueurPassif);
+        JoueurActif.APioche = false;
         Tour++;
 
         foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
@@ -107,6 +131,38 @@ public class GameManager : MonoBehaviour
             if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(true); }
         }
 
+        //Le gros pavé pour échanger les terrains de côtés et cacher les cartes cachées.
+
+        JoueurActif.Terrain[0].gameObject.transform.Translate(0, 660, 0f);
+        if (JoueurActif.Terrain[0].CartePlacee != null) { JoueurActif.Terrain[0].CartePlacee.gameObject.transform.Translate(0, 660, 0f); }
+        JoueurPassif.Terrain[0].gameObject.transform.Translate(0, -660, 0f);
+        if (JoueurPassif.Terrain[0].CartePlacee != null) { JoueurPassif.Terrain[0].CartePlacee.gameObject.transform.Translate(0, -660, 0f); }
+        for (int i = 1; i <= 2; i++)
+        {
+            if (JoueurActif.Terrain[i].CartePlacee != null)
+            {
+                JoueurActif.Terrain[i].CartePlacee.gameObject.transform.Translate(0, 460, 0f);
+                if (JoueurActif.Terrain[i].CartePlacee.EstCachee == true)
+                {
+                    JoueurActif.Terrain[i].CartePlacee.GetComponent<UnityEngine.UI.Image>().sprite = ImageDosCarte;
+                }
+            }
+            JoueurActif.Terrain[i].gameObject.transform.Translate(0, 460, 0f);
+        }
+        for (int i = 1; i <= 2; i++)
+        {
+            if (JoueurPassif.Terrain[i].CartePlacee != null)
+            {
+                JoueurPassif.Terrain[i].CartePlacee.gameObject.transform.Translate(0, -460, 0f);
+                if (JoueurPassif.Terrain[i].CartePlacee.EstCachee == true)
+                {
+                    JoueurPassif.Terrain[i].CartePlacee.GetComponent<UnityEngine.UI.Image>().sprite = JoueurPassif.Terrain[i].CartePlacee.ImageOriginale;
+                }
+            }
+            JoueurPassif.Terrain[i].gameObject.transform.Translate(0, -460, 0f);
+        }
+
+
         if (Tour % 2 == 0)
         {
             JoueurActif = J2;
@@ -119,6 +175,28 @@ public class GameManager : MonoBehaviour
         }
 
         SlotsCartes = JoueurActif.Deck;
+        /*
+        ChoixDeStratege();
+        PMEnCours = JoueurActif.Terrain[0].CartePlacee.PM;
+        JoueurActif.Terrain[0].CartePlacee.Stratege = true;*/
+        /* Ne marche uniquement si le stratège reste en place ;-;
+        if (JoueurActif.Terrain[0].CartePlacee != null)
+        { PMEnCours = JoueurActif.Terrain[0].CartePlacee.PM; }
+        */
+    }
+
+    public void ChoixDeStratege()
+    {
+        { StartCoroutine(ChoixEnAttente()); }
+
+    }
+
+    IEnumerator ChoixEnAttente() //Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
+    {
+        FondColore.gameObject.transform.Translate(0, -585, 0f);
+        ActionEnCoursTexte.text = "Choisissez un stratège, glissez le dans la case du centre".ToString();
+        yield return new WaitUntil(() => JoueurActif.Terrain[0].CartePlacee != null);
+        FondColore.gameObject.transform.Translate(0, 585, 0f);
     }
 
 }

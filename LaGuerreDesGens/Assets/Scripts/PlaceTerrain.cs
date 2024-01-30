@@ -18,6 +18,8 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler
             eventData.pointerDrag.GetComponent<Carte>().EstEnJeu = true; //Si je pose la carte sur la place, on pose un true
             CartePlacee = eventData.pointerDrag.GetComponent<Carte>();
             eventData.pointerDrag.GetComponent<Carte>().PlaceTerrainOccupee = this;
+            if (this == JeuEnCours.JoueurActif.Terrain[0]) { CartePlacee.EstCachee = false; }
+            else { CartePlacee.EstCachee = true; }
         }
     }
 
