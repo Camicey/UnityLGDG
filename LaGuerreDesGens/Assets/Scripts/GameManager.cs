@@ -10,29 +10,59 @@ public class GameManager : MonoBehaviour
     public Joueur J1;
     public Joueur J2;
     public Joueur JoueurActif;
-    public Joueur JoueurPassif { get; set; }
+    public Joueur JoueurPassif;
     public int Tour { get; set; }
     public List<PlaceDeck> SlotsCartes = new List<PlaceDeck>();
     public List<CarteSettings> CartesMontrable = new List<CarteSettings>();
     public GrosseCarte grosseCarte;
-    public bool CarteMontreeEnCours;
+    public bool CarteMontreeEnCours = false;
+    public bool EstEnTrainDeChoisirStratège = false;
 
     //public List<BoutonCache> BoutonsDerriere = new List<BoutonCache>();
 
 
     void Start()
     {
-        JoueurActif = J1;
+        //Demander les infos des joueurs
+        //Demander quelles familles ils veulent jouer
+        NouvellePartie(); //Normalement on aura des choix donc il changera de place
+    }
+
+    protected void NouvellePartie() // On récupèrera les joueurs et familles
+    {
+        JoueurActif = J1; //Ce sera une création de joueur à la place
         JoueurPassif = J2;
-        Tour = 0;
-        CarteMontreeEnCours = false;
-        //SlotsCartes = JoueurActif.PlaceDeck;
-        foreach (Carte carte in Pioche)
+        Tour = 1;
+        foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
+        {
+            slot.gameObject.SetActive(true);
+        }
+        foreach (PlaceDeck slot in JoueurPassif.Deck) //On cache le deck qu'on a
+        {
+            slot.gameObject.SetActive(false);
+        }
+        SlotsCartes = JoueurActif.Deck;
+
+        foreach (Carte carte in Pioche) //Ca donne les endroits du deck pour le jeu
         {
             carte.PlaceOccupee = PlacePioche;
         }
-    }
 
+        // Mettre toutes les cartes choisies dans
+        /*
+        foreach(carte in carteSettings TOTALE)
+        if(famille == famille choisie)
+        {
+            CartesMontrables.Add()
+        }
+        foreach(carte in carte TOTALE)
+        if(famille == famille choisie)
+        {
+            Pioche.Add()
+        }
+        */
+
+    }
 
     public void Piocher()
     {
@@ -47,6 +77,7 @@ public class GameManager : MonoBehaviour
                     randCarte.gameObject.SetActive(true);
                     randCarte.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
                     slot.availableCarteSlots = false;
+                    slot.CartePlacee = randCarte;
                     randCarte.PositionBase = slot.rectTransform.anchoredPosition;
                     randCarte.PlaceOccupee = slot;
                     Pioche.Remove(randCarte);
@@ -60,17 +91,21 @@ public class GameManager : MonoBehaviour
     public void ChangerDeTour()
     {
 
-        Debug.Log("On change de tour");
-        Debug.Log(Tour);
+        Debug.Log("On change de tour : " + Tour);
+        Debug.Log(JoueurPassif);
+        Tour++;
 
-        /*
-        foreach (PlaceDeck slot in carteSlots)
+        foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
         {
-            Vector2 descendre = new Vector2(0, 500);
-            // this.gameObject.transform.Translate(90, 180, 0f); //Ne marche surement
-            slot.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition - descendre;
+            slot.gameObject.SetActive(false);
+            if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(false); }
         }
-        */
+
+        foreach (PlaceDeck slot in JoueurPassif.Deck) // On montre le deck de l'autre joueur
+        {
+            slot.gameObject.SetActive(true);
+            if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(true); }
+        }
 
         if (Tour % 2 == 0)
         {
@@ -82,15 +117,8 @@ public class GameManager : MonoBehaviour
             JoueurActif = J1;
             JoueurPassif = J2;
         }
-        Tour++;
-        //carteSlots = JoueurActif.placeDeck;
-        /*
-        foreach (Deck slot in carteSlots)
-        {
-            Vector2 monter = new Vector2(0, 500);
-            slot.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition + monter;
-        }
-        */
+
+        SlotsCartes = JoueurActif.Deck;
     }
 
 }

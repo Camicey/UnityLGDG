@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
@@ -21,10 +22,10 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public int IdPouvoir;
     public float CoutPouvoir;
     public List<Carte> Liens = new List<Carte>();
-    public bool EstCachee;
-    public bool EstMontree;
-    public bool EstEnJeu;
-    public bool Stratege;
+    public bool EstCachee = false;
+    public bool EstMontree = false;
+    public bool EstEnJeu = false;
+    public bool Stratege = false;
 
     //public Joueur Appartenance;
     public Vector2 PositionBase;
@@ -37,10 +38,6 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
-        EstEnJeu = false;
-        EstCachee = false;
-        EstMontree = false;
-        Stratege = false;
         PositionBase = rectTransform.anchoredPosition;
     }
     /*
@@ -143,6 +140,12 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
             JeuEnCours.CarteMontreeEnCours = EstMontree;
             Debug.Log("Une carte est montrée :" + JeuEnCours.CarteMontreeEnCours);
         }
+        /*
+            if (JeuEnCours.EstEnTrainDeChoisirStratège == true && EstEnJeu == false)
+            {
+
+            }
+        */
     }
 
     public void OnDrop(PointerEventData eventData)

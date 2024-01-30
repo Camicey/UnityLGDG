@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class PlaceDeck : MonoBehaviour
 {
+    public GameManager JeuEnCours;
+    public Joueur JoueurAppartenance;
+    public bool availableCarteSlots = true;
+    public Carte CartePlacee = null;
     public RectTransform rectTransform;
-    public bool availableCarteSlots;
+
 
     void Start()
     {
-        availableCarteSlots = true;
+        availableCarteSlots = true; //Ne pas enlever, bug sinon
         rectTransform = GetComponent<RectTransform>();
     }
 

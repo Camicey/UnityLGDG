@@ -5,8 +5,9 @@ using UnityEngine.EventSystems;
 public class PlaceTerrain : MonoBehaviour, IDropHandler
 {
     public Carte CartePlacee;
-    public Joueur JoueurAppartient;
     public GameManager JeuEnCours;
+    public Joueur JoueurAppartient;
+
 
     public void OnDrop(PointerEventData eventData)
     {
