@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     public Joueur JoueurActif;
     protected Joueur JoueurPassif;
     public int Tour { get; set; }
-    protected float PMEnCours;
+    public float PMEnCours;
     public List<PlaceDeck> SlotsCartes = new List<PlaceDeck>();
     public List<CarteSettings> CartesMontrable = new List<CarteSettings>();
     public GrosseCarte grosseCarte;
@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     public bool EstEnTrainDeChoisirStratège = false;
     public Sprite ImageDosCarte;
     public Text ActionEnCoursTexte;
+    public Text PMEnCoursTexte;
 
     //public List<BoutonCache> BoutonsDerriere = new List<BoutonCache>();
 
@@ -31,7 +32,7 @@ public class GameManager : MonoBehaviour
         //Demander les infos des joueurs
         //Demander quelles familles ils veulent jouer
         //NouvellePartie(); //Normalement on aura des choix donc il changera de place
-
+        PMEnCoursTexte.text = "0".ToString();
     }
 
     public void NouvellePartie() // On récupèrera les joueurs et familles
@@ -131,6 +132,50 @@ public class GameManager : MonoBehaviour
             if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(true); }
         }
 
+        EchangerTerrainCoteCacherCartes();
+
+        //Retirer la carte montrée
+        if (CarteMontreeEnCours == true)
+        {
+            grosseCarte.SeDecaler(grosseCarte.Carte, false);
+            CarteMontreeEnCours = false;
+        }
+
+        if (Tour % 2 == 0)
+        {
+            JoueurActif = J2;
+            JoueurPassif = J1;
+        }
+        else
+        {
+            JoueurActif = J1;
+            JoueurPassif = J2;
+        }
+
+        SlotsCartes = JoueurActif.Deck;
+
+        if (Tour == 1 || Tour == 2) { PMEnCours = 3; StartCoroutine(ChoixDeStratege()); }
+        else if (Tour > 2) { PMEnCours = JoueurActif.Terrain[0].CartePlacee.PM; AfficherPM(); } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
+
+    }
+
+    IEnumerator ChoixDeStratege() //Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
+    {
+        FondColore.gameObject.transform.Translate(0, -585, 0f);
+        ActionEnCoursTexte.text = "Choisissez un stratège, glissez le dans la case du centre".ToString();
+        yield return new WaitUntil(() => JoueurActif.Terrain[0].CartePlacee != null);
+        FondColore.gameObject.transform.Translate(0, 585, 0f);
+        JoueurActif.Terrain[0].CartePlacee.Stratege = true;
+        AfficherPM();
+    }
+
+    public void AfficherPM()
+    {
+        PMEnCoursTexte.text = PMEnCours.ToString() + " / " + JoueurActif.Terrain[0].CartePlacee.PM.ToString();
+    }
+
+    public void EchangerTerrainCoteCacherCartes()
+    {
         //Le gros pavé pour échanger les terrains de côtés et cacher les cartes cachées.
 
         JoueurActif.Terrain[0].gameObject.transform.Translate(0, 660, 0f);
@@ -161,42 +206,5 @@ public class GameManager : MonoBehaviour
             }
             JoueurPassif.Terrain[i].gameObject.transform.Translate(0, -460, 0f);
         }
-
-
-        if (Tour % 2 == 0)
-        {
-            JoueurActif = J2;
-            JoueurPassif = J1;
-        }
-        else
-        {
-            JoueurActif = J1;
-            JoueurPassif = J2;
-        }
-
-        SlotsCartes = JoueurActif.Deck;
-        /*
-        ChoixDeStratege();
-        PMEnCours = JoueurActif.Terrain[0].CartePlacee.PM;
-        JoueurActif.Terrain[0].CartePlacee.Stratege = true;*/
-        /* Ne marche uniquement si le stratège reste en place ;-;
-        if (JoueurActif.Terrain[0].CartePlacee != null)
-        { PMEnCours = JoueurActif.Terrain[0].CartePlacee.PM; }
-        */
     }
-
-    public void ChoixDeStratege()
-    {
-        { StartCoroutine(ChoixEnAttente()); }
-
-    }
-
-    IEnumerator ChoixEnAttente() //Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
-    {
-        FondColore.gameObject.transform.Translate(0, -585, 0f);
-        ActionEnCoursTexte.text = "Choisissez un stratège, glissez le dans la case du centre".ToString();
-        yield return new WaitUntil(() => JoueurActif.Terrain[0].CartePlacee != null);
-        FondColore.gameObject.transform.Translate(0, 585, 0f);
-    }
-
 }

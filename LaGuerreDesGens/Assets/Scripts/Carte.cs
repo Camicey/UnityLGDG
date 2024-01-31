@@ -62,7 +62,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         }
     }
 
-    public CarteSettings ChercherCarte()
+    public CarteSettings ChercherCarteSettings()
     {
         foreach (CarteSettings carteCherchee in JeuEnCours.CartesMontrable)
         {
@@ -103,12 +103,12 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         {
             rectTransform.anchoredPosition = PositionBase;
         }
-        else
+        else if (PlaceOccupee != null)
         {
+
             PlaceOccupee.availableCarteSlots = true;
             PlaceOccupee.CartePlacee = null;
             PlaceOccupee = null;
-
         }
     }
 
@@ -119,18 +119,19 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
             if (JeuEnCours.CarteMontreeEnCours == false) //Je montre une carte
             {
-                JeuEnCours.grosseCarte.SeDecaler(ChercherCarte(), true);
+                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(), true);
                 //jeuEnCours.EnleverBouton();
                 Debug.Log("Montrer");
+                EstMontree = true;
             }
             else if (Id == JeuEnCours.grosseCarte.Carte.Id)
             {
-                JeuEnCours.grosseCarte.SeDecaler(ChercherCarte(), false);
+                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(), false);
                 //jeuEnCours.RemettreBouton();
                 Debug.Log("Cacher");
+                EstMontree = false;
             }
             else { return; }
-            EstMontree = !EstMontree;
             JeuEnCours.CarteMontreeEnCours = EstMontree;
             Debug.Log("Une carte est montrée :" + JeuEnCours.CarteMontreeEnCours);
         }
@@ -148,7 +149,8 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
     public void OnDrop(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        Debug.Log("On dirait une erreur.");
+        //throw new System.NotImplementedException();
     }
 
 }

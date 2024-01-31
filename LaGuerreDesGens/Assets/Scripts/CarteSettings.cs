@@ -20,4 +20,5 @@ public class CarteSettings : ScriptableObject
     public string Type;
     public Sprite TypeImage;
     public List<CarteSettings> liens = new List<CarteSettings>();
+
 }
