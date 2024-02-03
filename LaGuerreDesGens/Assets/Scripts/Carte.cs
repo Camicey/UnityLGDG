@@ -62,16 +62,30 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         }
     }
 
-    public CarteSettings ChercherCarteSettings()
+    public CarteSettings ChercherCarteSettings(int id)
     {
         foreach (CarteSettings carteCherchee in JeuEnCours.CartesMontrable)
         {
-            if (carteCherchee.Id == Id)
+            if (carteCherchee.Id == id)
             {
                 return carteCherchee;
             }
         }
         return JeuEnCours.CartesMontrable[0];
+    }
+
+    public void MettreBonBoutons()
+    {
+        if (JeuEnCours.JoueurActif.CartesPossedees.Contains(this))
+        {
+            if (Stratege == true) { JeuEnCours.MontrerBoutonsChoix("StrategeAllie"); } // Il faudra rajouter carte seule a la fin ;-;
+            else { JeuEnCours.MontrerBoutonsChoix("Allie"); }
+        }
+        else
+        {
+            if (Stratege == true) { JeuEnCours.MontrerBoutonsChoix("StrategeEnnemi"); }
+            else { JeuEnCours.MontrerBoutonsChoix("Ennemi"); }
+        }
     }
 
     //Tout en dessous c'est pour déplacer la carte
@@ -114,26 +128,33 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (EstEnJeu == true && (EstCachee == false || JeuEnCours.JoueurActif == Appartenance)) // 
+        if (EstEnJeu == true && (EstCachee == false || JeuEnCours.JoueurActif == Appartenance)) //Si elle est montré ou qu'elle nous appartient
         {
 
-            if (JeuEnCours.CarteMontreeEnCours == false) //Je montre une carte
+            if (JeuEnCours.CarteMontree == null) //Je montre une carte
             {
-                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(), true);
-                //jeuEnCours.EnleverBouton();
-                Debug.Log("Montrer");
+                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(Id), true);
+                JeuEnCours.CarteMontree = this;
+                MettreBonBoutons();
                 EstMontree = true;
             }
-            else if (Id == JeuEnCours.grosseCarte.Carte.Id)
+            else if (Id == JeuEnCours.grosseCarte.Carte.Id) //Je cache la carte
             {
-                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(), false);
-                //jeuEnCours.RemettreBouton();
-                Debug.Log("Cacher");
+                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(Id), false);
+                JeuEnCours.CarteMontree = null;
+                JeuEnCours.EnleverBonBoutons();
                 EstMontree = false;
             }
-            else { return; }
-            JeuEnCours.CarteMontreeEnCours = EstMontree;
-            Debug.Log("Une carte est montrée :" + JeuEnCours.CarteMontreeEnCours);
+            else // J'échange de carte
+            {
+                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(JeuEnCours.CarteMontree.Id), false);
+                JeuEnCours.CarteMontree.EstMontree = false;
+                JeuEnCours.EnleverBonBoutons();
+                MettreBonBoutons();
+                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(Id), true);
+                JeuEnCours.CarteMontree = this;
+            }
+            Debug.Log("Une carte est montrée :" + (JeuEnCours.CarteMontree != null));
         }
         else
         {

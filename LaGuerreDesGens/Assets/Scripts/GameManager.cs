@@ -17,13 +17,12 @@ public class GameManager : MonoBehaviour
     public List<PlaceDeck> SlotsCartes = new List<PlaceDeck>();
     public List<CarteSettings> CartesMontrable = new List<CarteSettings>();
     public GrosseCarte grosseCarte;
-    public bool CarteMontreeEnCours = false;
+    public Carte CarteMontree;
     public bool EstEnTrainDeChoisirStratège = false;
     public Sprite ImageDosCarte;
     public Text ActionEnCoursTexte;
     public Text PMEnCoursTexte;
-
-    //public List<BoutonCache> BoutonsDerriere = new List<BoutonCache>();
+    public List<BoutonChoix> BoutonsDeJeu = new List<BoutonChoix>();
 
     public GameObject FondColore;
 
@@ -135,10 +134,10 @@ public class GameManager : MonoBehaviour
         EchangerTerrainCoteCacherCartes();
 
         //Retirer la carte montrée
-        if (CarteMontreeEnCours == true)
+        if (CarteMontree != null)
         {
             grosseCarte.SeDecaler(grosseCarte.Carte, false);
-            CarteMontreeEnCours = false;
+            CarteMontree = null;
         }
 
         if (Tour % 2 == 0)
@@ -153,12 +152,11 @@ public class GameManager : MonoBehaviour
         }
 
         SlotsCartes = JoueurActif.Deck;
-
+        EnleverBonBoutons();
         if (Tour == 1 || Tour == 2) { PMEnCours = 3; StartCoroutine(ChoixDeStratege()); }
         else if (Tour > 2) { PMEnCours = JoueurActif.Terrain[0].CartePlacee.PM; AfficherPM(); } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
 
     }
-
     IEnumerator ChoixDeStratege() //Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
     {
         FondColore.gameObject.transform.Translate(0, -585, 0f);
@@ -168,12 +166,98 @@ public class GameManager : MonoBehaviour
         JoueurActif.Terrain[0].CartePlacee.Stratege = true;
         AfficherPM();
     }
-
     public void AfficherPM()
     {
-        PMEnCoursTexte.text = PMEnCours.ToString() + " / " + JoueurActif.Terrain[0].CartePlacee.PM.ToString();
+        if (JoueurActif.Terrain[0].CartePlacee != null)
+        { PMEnCoursTexte.text = PMEnCours.ToString() + " / " + JoueurActif.Terrain[0].CartePlacee.PM.ToString(); }
+        else { PMEnCoursTexte.text = "Stratege".ToString(); }
     }
 
+    public void Attaquer()
+    {
+
+    }
+
+    public void SeDeplacer()
+    {
+
+    }
+
+    public void Retirer()
+    {
+
+        foreach (PlaceDeck slot in SlotsCartes)
+        {
+            if (slot.availableCarteSlots == true)
+            {
+                CarteMontree.gameObject.SetActive(true);
+
+                CarteMontree.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
+                slot.availableCarteSlots = false;
+                CarteMontree.PlaceOccupee = slot;
+                slot.CartePlacee = CarteMontree;
+                CarteMontree.PlaceTerrainOccupee.CartePlacee = null;
+                CarteMontree.PlaceTerrainOccupee = null;
+                CarteMontree.PositionBase = slot.rectTransform.anchoredPosition;
+                CarteMontree.EstMontree = false;
+                CarteMontree.EstCachee = false;
+                CarteMontree.EstEnJeu = false;
+                CarteMontree.Stratege = false;
+                grosseCarte.SeDecaler(CarteMontree.ChercherCarteSettings(CarteMontree.Id), false);
+                CarteMontree = null;
+                PMEnCours -= 1;
+                AfficherPM();
+                EnleverBonBoutons();
+                return;
+            }
+        }
+    }
+
+    public void Pouvoir()
+    {
+
+    }
+    public void MontrerBoutonsChoix(string situation) //Finie
+    {
+        Debug.Log(situation);
+        switch (situation)
+        {
+            case "Allie":
+                BoutonsDeJeu[0].Montrer(); //Attaquer
+                BoutonsDeJeu[1].Montrer(); //Deplacer
+                BoutonsDeJeu[2].Montrer(); //Retirer
+                BoutonsDeJeu[3].Montrer(); //Pouvoir
+                break;
+            case "StrategeAllie":
+                BoutonsDeJeu[0].Montrer();
+                BoutonsDeJeu[4].Montrer(); //Retirer pour stratege
+                BoutonsDeJeu[3].Montrer();
+                break;
+            case "Ennemi":
+                BoutonsDeJeu[0].Montrer();
+                break;
+            case "StrategeEnnemi":
+                BoutonsDeJeu[0].Montrer();
+                break;
+            case "StrategeSeul":
+                BoutonsDeJeu[0].Montrer();
+                BoutonsDeJeu[1].Montrer();
+                break;
+            default:
+                break;
+        }
+
+    }
+    public void EnleverBonBoutons()
+    {
+        foreach (BoutonChoix bouton in BoutonsDeJeu)
+        {
+            if (bouton.EstMontree)
+            {
+                bouton.Cacher();
+            }
+        }
+    }
     public void EchangerTerrainCoteCacherCartes()
     {
         //Le gros pavé pour échanger les terrains de côtés et cacher les cartes cachées.

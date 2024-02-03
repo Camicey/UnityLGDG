@@ -27,7 +27,7 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler
             JeuEnCours.PMEnCours -= 1;
             JeuEnCours.AfficherPM();
         }
-        { Debug.Log("Oh oh problem for you"); }
+        else { Debug.Log("Oh oh problem for you"); }
     }
 
 }
