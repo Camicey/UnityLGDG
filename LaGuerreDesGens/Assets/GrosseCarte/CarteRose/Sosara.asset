@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 30
   PVar: 30
   PA: 10
+  IdPouvoir: 3
   Pouvoir: Soigne 20 PV
   CoutPouvoir: 2
   Famille: Rose

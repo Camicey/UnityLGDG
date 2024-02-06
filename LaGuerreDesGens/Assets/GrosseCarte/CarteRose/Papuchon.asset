@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 20
   PVar: 20
   PA: 5
+  IdPouvoir: 13
   Pouvoir: "Si tu\xE9, revient dans la pioche. Si pioche vide, d\xE9fausser."
   CoutPouvoir: 0
   Famille: Rose

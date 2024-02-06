@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 40
   PVar: 40
   PA: 10
+  IdPouvoir: 2
   Pouvoir: Soigne 10 PV
   CoutPouvoir: 2
   Famille: Bleue

@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 10
   PVar: 10
   PA: 35
+  IdPouvoir: 11
   Pouvoir: Toutes les cartes d'une famille se retournent.
   CoutPouvoir: 2
   Famille: Rose

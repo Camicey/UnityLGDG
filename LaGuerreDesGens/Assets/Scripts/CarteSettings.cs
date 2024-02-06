@@ -13,6 +13,7 @@ public class CarteSettings : ScriptableObject
     public int PV;
     public int PVar;
     public int PA;
+    public int IdPouvoir;
     public string Pouvoir;
     public float CoutPouvoir;
     public string Famille;

@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 20
   PVar: 20
   PA: 20
+  IdPouvoir: 4
   Pouvoir: Immobilise un personnage mais perd 10 PV
   CoutPouvoir: 1
   Famille: Bleue

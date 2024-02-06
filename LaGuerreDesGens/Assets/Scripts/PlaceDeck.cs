@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlaceDeck : MonoBehaviour
 {
     public GameManager JeuEnCours;
-    public Joueur JoueurAppartenance;
+    public Joueur Appartenance;
     public bool availableCarteSlots;
     public Carte CartePlacee = null;
     public RectTransform rectTransform;

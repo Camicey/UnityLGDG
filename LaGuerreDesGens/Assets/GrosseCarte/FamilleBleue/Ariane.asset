@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 10
   PVar: 10
   PA: 35
+  IdPouvoir: 7
   Pouvoir: "Se d\xE9place n'importe o\xF9."
   CoutPouvoir: 2
   Famille: Bleue

@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 25
   PVar: 25
   PA: 25
+  IdPouvoir: 1
   Pouvoir: Supprime un pouvoir
   CoutPouvoir: 3
   Famille: Bleue

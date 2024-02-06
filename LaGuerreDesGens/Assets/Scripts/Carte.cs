@@ -8,22 +8,13 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 {
     [SerializeField] private Canvas canvas;
     private CanvasGroup canvasGroup;
-
     public RectTransform rectTransform;
 
     public int Id;
-    public string Prenom;
-    public float PM;
-    public int PV;
-    public int PVar;
-    public int PA;
-    public string Type;
-    public string Famille;
-    public int IdPouvoir;
-    public float CoutPouvoir;
+    public CarteSettings Statistiques;
     public List<Carte> Liens = new List<Carte>();
     public bool EstCachee = false; //Est cachée à l'adversaire
-    public bool EstMontree = false; //Est montrée sur la grande carte
+    public bool EstMontreeSurCarte = false; //Est montrée sur la grande carte
     public bool EstEnJeu = false; //Est sur le plateau
     public bool Stratege = false;
 
@@ -41,6 +32,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         PositionBase = rectTransform.anchoredPosition;
+        Statistiques.PVar = Statistiques.PV;
     }
 
     public void Agrandir() // Agrandir la carte.
@@ -62,17 +54,8 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         }
     }
 
-    public CarteSettings ChercherCarteSettings(int id)
-    {
-        foreach (CarteSettings carteCherchee in JeuEnCours.CartesMontrable)
-        {
-            if (carteCherchee.Id == id)
-            {
-                return carteCherchee;
-            }
-        }
-        return JeuEnCours.CartesMontrable[0];
-    }
+
+
 
     public void MettreBonBoutons()
     {
@@ -86,6 +69,16 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
             if (Stratege == true) { JeuEnCours.MontrerBoutonsChoix("StrategeEnnemi"); }
             else { JeuEnCours.MontrerBoutonsChoix("Ennemi"); }
         }
+    }
+
+    public void Mourir()
+    {
+        Appartenance.CartesPossedees.Remove(this);
+        Appartenance = null;
+        EstEnJeu = false;
+        this.gameObject.transform.Translate(0, 1000, 0f);
+        PlaceTerrainOccupee.CartePlacee = null;
+        PlaceTerrainOccupee = null;
     }
 
     //Tout en dessous c'est pour déplacer la carte
@@ -128,30 +121,31 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (EstEnJeu == true && (EstCachee == false || JeuEnCours.JoueurActif == Appartenance)) //Si elle est montré ou qu'elle nous appartient
+        if (JeuEnCours.EstEnTrainDAttaquer == true && EstEnJeu == true)
+        {
+            JeuEnCours.CarteCiblee = this;
+        }
+        else if (EstEnJeu == true && (EstCachee == false || JeuEnCours.JoueurActif == Appartenance)) //Si elle est montré ou qu'elle nous appartient
         {
 
             if (JeuEnCours.CarteMontree == null) //Je montre une carte
             {
-                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(Id), true);
+                JeuEnCours.grosseCarte.SeDecaler(Statistiques, true);
                 JeuEnCours.CarteMontree = this;
                 MettreBonBoutons();
-                EstMontree = true;
+                EstMontreeSurCarte = true;
             }
             else if (Id == JeuEnCours.grosseCarte.Carte.Id) //Je cache la carte
             {
-                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(Id), false);
-                JeuEnCours.CarteMontree = null;
-                JeuEnCours.EnleverBonBoutons();
-                EstMontree = false;
+                JeuEnCours.CacherGrandeCarte();
             }
             else // J'échange de carte
             {
-                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(JeuEnCours.CarteMontree.Id), false);
-                JeuEnCours.CarteMontree.EstMontree = false;
+                JeuEnCours.grosseCarte.SeDecaler(JeuEnCours.CarteMontree.Statistiques, false);
+                JeuEnCours.CarteMontree.EstMontreeSurCarte = false;
                 JeuEnCours.EnleverBonBoutons();
                 MettreBonBoutons();
-                JeuEnCours.grosseCarte.SeDecaler(ChercherCarteSettings(Id), true);
+                JeuEnCours.grosseCarte.SeDecaler(Statistiques, true);
                 JeuEnCours.CarteMontree = this;
             }
             Debug.Log("Une carte est montrée :" + (JeuEnCours.CarteMontree != null));
@@ -160,12 +154,9 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         {
             Debug.Log("Vous ne pouvez pas voir cette carte.");
         }
-        /*
-            if (JeuEnCours.EstEnTrainDeChoisirStratège == true && EstEnJeu == false)
-            {
 
-            }
-        */
+
+
     }
 
     public void OnDrop(PointerEventData eventData)

@@ -18,7 +18,8 @@ public class GameManager : MonoBehaviour
     public List<CarteSettings> CartesMontrable = new List<CarteSettings>();
     public GrosseCarte grosseCarte;
     public Carte CarteMontree;
-    public bool EstEnTrainDeChoisirStratège = false;
+    public Carte CarteCiblee; //Carte ciblée dans une attaque
+    public bool EstEnTrainDAttaquer = false;
     public Sprite ImageDosCarte;
     public Text ActionEnCoursTexte;
     public Text PMEnCoursTexte;
@@ -39,6 +40,7 @@ public class GameManager : MonoBehaviour
         JoueurActif = J1; //Ce sera une création de joueur à la place
         JoueurPassif = J2;
         Tour = -1;
+        CarteCiblee = null;
         foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
         {
             slot.gameObject.SetActive(true);
@@ -114,8 +116,7 @@ public class GameManager : MonoBehaviour
     public void ChangerDeTour()
     {
 
-        Debug.Log("On change de tour : " + Tour);
-        Debug.Log(JoueurPassif);
+        Debug.Log("On change de tour : " + Tour + JoueurPassif);
         JoueurActif.APioche = false;
         Tour++;
 
@@ -133,14 +134,9 @@ public class GameManager : MonoBehaviour
 
         EchangerTerrainCoteCacherCartes();
 
-        //Retirer la carte montrée
-        if (CarteMontree != null)
-        {
-            grosseCarte.SeDecaler(grosseCarte.Carte, false);
-            CarteMontree = null;
-        }
+        if (CarteMontree != null) { CacherGrandeCarte(); } //Retirer la carte montrée
 
-        if (Tour % 2 == 0)
+        if (Tour % 2 == 0) //Changement de joueur
         {
             JoueurActif = J2;
             JoueurPassif = J1;
@@ -154,7 +150,7 @@ public class GameManager : MonoBehaviour
         SlotsCartes = JoueurActif.Deck;
         EnleverBonBoutons();
         if (Tour == 1 || Tour == 2) { PMEnCours = 3; StartCoroutine(ChoixDeStratege()); }
-        else if (Tour > 2) { PMEnCours = JoueurActif.Terrain[0].CartePlacee.PM; AfficherPM(); } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
+        else if (Tour > 2) { PMEnCours = JoueurActif.Terrain[0].CartePlacee.Statistiques.PM; AfficherPM(); } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
 
     }
     IEnumerator ChoixDeStratege() //Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
@@ -169,13 +165,107 @@ public class GameManager : MonoBehaviour
     public void AfficherPM()
     {
         if (JoueurActif.Terrain[0].CartePlacee != null)
-        { PMEnCoursTexte.text = PMEnCours.ToString() + " / " + JoueurActif.Terrain[0].CartePlacee.PM.ToString(); }
+        { PMEnCoursTexte.text = PMEnCours.ToString() + " / " + JoueurActif.Terrain[0].CartePlacee.Statistiques.PM.ToString(); }
         else { PMEnCoursTexte.text = "Stratege".ToString(); }
     }
 
     public void Attaquer()
     {
+        if (PMEnCours >= 1)
+        {
+            EstEnTrainDAttaquer = true;
+            //Qui voulez vous attaquer ? + Ecran derrière, possibilité de tapper. Tant qu'on ne choisit pas
+            FondColore.gameObject.transform.Translate(0, -50, 0f);
+            ActionEnCoursTexte.text = "Choisissez une cible, une personne à attaquer".ToString();
+            EnleverBonBoutons();
+            StartCoroutine(AttendreCiblee());
+            PMEnCours--;
+        }
 
+    }
+
+    IEnumerator AttendreCiblee()
+    {
+
+        yield return new WaitUntil(() => CarteCiblee != null);
+        FondColore.gameObject.transform.Translate(0, 50, 0f);
+        if (CarteCiblee.Appartenance == JoueurActif || !VerifierTerrainACote())// Vérifier que la carte est à côtée // Vérifier que la carte n'est pas liée
+        {
+            Debug.Log("Echec de l'attaque");
+        }
+        else
+        {
+
+            CarteCiblee.GetComponent<UnityEngine.UI.Image>().sprite = CarteCiblee.ImageOriginale;
+            CarteCiblee.EstCachee = false;
+            CarteMontree.EstCachee = false;
+            CarteCiblee.Statistiques.PVar = CarteCiblee.Statistiques.PVar - CarteMontree.Statistiques.PA;
+            if (CarteCiblee.Statistiques.PVar > 0)
+            {
+                CarteMontree.Statistiques.PVar = CarteMontree.Statistiques.PVar - CarteCiblee.Statistiques.PA;
+                if (CarteMontree.Statistiques.PVar <= 0) { CarteMontree.Mourir(); }
+            }
+            else { CarteCiblee.Mourir(); }
+            Debug.Log("Réussite de l'attaque :" + CarteCiblee.Statistiques.PVar);
+        }
+        CarteCiblee = null;
+        EstEnTrainDAttaquer = false;
+        CacherGrandeCarte();
+    }
+
+    public void CacherGrandeCarte()
+    {
+        grosseCarte.SeDecaler(CarteMontree.Statistiques, false);
+        EnleverBonBoutons();
+        CarteMontree.EstMontreeSurCarte = false;
+        CarteMontree = null;
+    }
+
+    protected bool VerifierTerrainACote() // C'est lonnng 
+    {
+        if (CarteMontree.PlaceTerrainOccupee.Id == 0)
+        {
+            if (CarteCiblee.PlaceTerrainOccupee.Id == 1 || CarteCiblee.PlaceTerrainOccupee.Id == 2)
+            {
+                return true;
+            }
+        }
+        else if (CarteMontree.PlaceTerrainOccupee.Id == 1)
+        {
+            if (CarteCiblee.PlaceTerrainOccupee.Id == 0 || CarteCiblee.PlaceTerrainOccupee.Id == 2 || CarteCiblee.PlaceTerrainOccupee.Id == 4)
+            {
+                return true;
+            }
+        }
+        else if (CarteMontree.PlaceTerrainOccupee.Id == 2)
+        {
+            if (CarteCiblee.PlaceTerrainOccupee.Id == 0 || CarteCiblee.PlaceTerrainOccupee.Id == 1 || CarteCiblee.PlaceTerrainOccupee.Id == 3)
+            {
+                return true;
+            }
+        }
+        else if (CarteMontree.PlaceTerrainOccupee.Id == 3)
+        {
+            if (CarteCiblee.PlaceTerrainOccupee.Id == 5 || CarteCiblee.PlaceTerrainOccupee.Id == 2 || CarteCiblee.PlaceTerrainOccupee.Id == 4)
+            {
+                return true;
+            }
+        }
+        else if (CarteMontree.PlaceTerrainOccupee.Id == 4)
+        {
+            if (CarteCiblee.PlaceTerrainOccupee.Id == 5 || CarteCiblee.PlaceTerrainOccupee.Id == 1 || CarteCiblee.PlaceTerrainOccupee.Id == 3)
+            {
+                return true;
+            }
+        }
+        else if (CarteMontree.PlaceTerrainOccupee.Id == 5)
+        {
+            if (CarteCiblee.PlaceTerrainOccupee.Id == 3 || CarteCiblee.PlaceTerrainOccupee.Id == 4)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void SeDeplacer()
@@ -185,32 +275,32 @@ public class GameManager : MonoBehaviour
 
     public void Retirer()
     {
-
-        foreach (PlaceDeck slot in SlotsCartes)
+        if (PMEnCours >= 1)
         {
-            if (slot.availableCarteSlots == true)
+            foreach (PlaceDeck slot in SlotsCartes)
             {
-                CarteMontree.gameObject.SetActive(true);
+                if (slot.availableCarteSlots == true)
+                {
+                    CarteMontree.gameObject.SetActive(true);
 
-                CarteMontree.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
-                slot.availableCarteSlots = false;
-                CarteMontree.PlaceOccupee = slot;
-                slot.CartePlacee = CarteMontree;
-                CarteMontree.PlaceTerrainOccupee.CartePlacee = null;
-                CarteMontree.PlaceTerrainOccupee = null;
-                CarteMontree.PositionBase = slot.rectTransform.anchoredPosition;
-                CarteMontree.EstMontree = false;
-                CarteMontree.EstCachee = false;
-                CarteMontree.EstEnJeu = false;
-                CarteMontree.Stratege = false;
-                grosseCarte.SeDecaler(CarteMontree.ChercherCarteSettings(CarteMontree.Id), false);
-                CarteMontree = null;
-                PMEnCours -= 1;
-                AfficherPM();
-                EnleverBonBoutons();
-                return;
+                    CarteMontree.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
+                    slot.availableCarteSlots = false;
+                    CarteMontree.PlaceOccupee = slot;
+                    slot.CartePlacee = CarteMontree;
+                    CarteMontree.PlaceTerrainOccupee.CartePlacee = null;
+                    CarteMontree.PlaceTerrainOccupee = null;
+                    CarteMontree.PositionBase = slot.rectTransform.anchoredPosition;
+                    CarteMontree.EstCachee = false;
+                    CarteMontree.EstEnJeu = false;
+                    CarteMontree.Stratege = false;
+                    CacherGrandeCarte();
+                    PMEnCours--;
+                    AfficherPM();
+                    return;
+                }
             }
         }
+
     }
 
     public void Pouvoir()
@@ -234,10 +324,10 @@ public class GameManager : MonoBehaviour
                 BoutonsDeJeu[3].Montrer();
                 break;
             case "Ennemi":
-                BoutonsDeJeu[0].Montrer();
+                BoutonsDeJeu[0].Montrer(); //Mauvaise attaque attention
                 break;
             case "StrategeEnnemi":
-                BoutonsDeJeu[0].Montrer();
+                BoutonsDeJeu[0].Montrer(); //Mauvaise attaque attention
                 break;
             case "StrategeSeul":
                 BoutonsDeJeu[0].Montrer();

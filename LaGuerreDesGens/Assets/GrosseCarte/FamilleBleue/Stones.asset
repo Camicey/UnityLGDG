@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 20
   PVar: 20
   PA: 30
+  IdPouvoir: 12
   Pouvoir: "Retourne toutes les cartes pi\xE8ges."
   CoutPouvoir: 1
   Famille: Bleue

@@ -5,15 +5,16 @@ using UnityEngine.EventSystems;
 public class PlaceTerrain : MonoBehaviour, IDropHandler
 {
     public Carte CartePlacee;
+    public int Id;
     public GameManager JeuEnCours;
-    public Joueur JoueurAppartient;
+    public Joueur Appartenance;
 
 
     public void OnDrop(PointerEventData eventData)
     {
         Debug.Log("OnDrop");
         if (eventData.pointerDrag != null &&
-        JoueurAppartient == JeuEnCours.JoueurActif &&
+        Appartenance == JeuEnCours.JoueurActif &&
         eventData.pointerDrag.GetComponent<Carte>().EstEnJeu == false &&
         eventData.pointerDrag.GetComponent<Carte>().Appartenance == JeuEnCours.JoueurActif &&
         JeuEnCours.PMEnCours >= 1)

@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 25
   PVar: 25
   PA: 20
+  IdPouvoir: 5
   Pouvoir: Coupe tous les liens d'une carte.
   CoutPouvoir: 2
   Famille: Bleue

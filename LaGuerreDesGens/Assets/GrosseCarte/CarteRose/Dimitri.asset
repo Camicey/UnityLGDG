@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 35
   PVar: 35
   PA: 5
+  IdPouvoir: 5
   Pouvoir: Coupe tous les liens d'une carte.
   CoutPouvoir: 1
   Famille: Rose

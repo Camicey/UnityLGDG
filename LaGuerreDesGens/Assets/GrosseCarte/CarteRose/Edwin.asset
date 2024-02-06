@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 25
   PVar: 25
   PA: 10
+  IdPouvoir: 8
   Pouvoir: Echange deux cartes.
   CoutPouvoir: 1
   Famille: Rose

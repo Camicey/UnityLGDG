@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 20
   PVar: 20
   PA: 25
+  IdPouvoir: 6
   Pouvoir: Fait un lien.
   CoutPouvoir: 3
   Famille: Bleue

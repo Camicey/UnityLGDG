@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 30
   PVar: 30
   PA: 10
+  IdPouvoir: 10
   Pouvoir: Toutes les cartes du plateau se retournent.
   CoutPouvoir: 3
   Famille: Bleue

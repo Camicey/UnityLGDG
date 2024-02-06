@@ -19,6 +19,7 @@ MonoBehaviour:
   PV: 15
   PVar: 15
   PA: 30
+  IdPouvoir: 9
   Pouvoir: "D\xE9fausse une carte au choix avec elle."
   CoutPouvoir: 4
   Famille: Rose
