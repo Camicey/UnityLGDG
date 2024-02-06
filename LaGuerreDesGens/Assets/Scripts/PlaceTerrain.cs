@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-public class PlaceTerrain : MonoBehaviour, IDropHandler
+public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
 {
     public Carte CartePlacee;
     public int Id;
@@ -29,6 +29,17 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler
             JeuEnCours.AfficherPM();
         }
         else { Debug.Log("Oh oh problem for you"); }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (JeuEnCours.EstEnTrainDeSeDeplacer == true && CartePlacee == null && JeuEnCours.VerifierTerrainACote(this))
+        {
+            JeuEnCours.TerrainCiblee = this;
+        }
+        else if (JeuEnCours.EstEnTrainDeSeDeplacer == true && CartePlacee != null)
+        { JeuEnCours.Warning("Il y a déjà quelqu'un ici !"); }
+        else if (!JeuEnCours.VerifierTerrainACote(this)) { JeuEnCours.Warning("Ce terrain est trop loin !"); }
     }
 
 }

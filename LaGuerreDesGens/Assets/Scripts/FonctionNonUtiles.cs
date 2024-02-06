@@ -28,5 +28,49 @@ public class FonctionsInutiles : MonoBehaviour
         }
         return JeuEnCours.CartesMontrable[0];
     }
+     IEnumerator AttendreCiblee(Carte attaquant, Carte receveur)
+    {
+        Warning("Choisissez avec qui " + attaquant.Stats.Prenom + " va se battre.");
+        yield return new WaitUntil(() => receveur != null);
+        FondColore.gameObject.transform.Translate(0, 50, 0f);
+        if (receveur.Appartenance == JoueurActif) // Vérifier que la carte est à côtée // Vérifier que la carte n'est pas liée
+        {
+            Warning("Cette carte vous appartient !");
+        }
+        else if (!VerifierTerrainACote())
+        {
+            Warning("Cette carte est trop loin !");
+        }
+        else
+        {
+            PMEnCours--;
+            receveur.GetComponent<UnityEngine.UI.Image>().sprite = receveur.ImageOriginale;
+            receveur.EstCachee = false;
+            attaquant.EstCachee = false;
+            receveur.Stats.PVar = receveur.Stats.PVar - attaquant.Stats.PA;
+            Warning(attaquant.Stats.Prenom + " a infligé " + attaquant.Stats.PA.ToString() + " a " + receveur.Stats.Prenom);
+            if (receveur.Stats.PVar > 0)
+            {
+                attaquant.Stats.PVar = attaquant.Stats.PVar - receveur.Stats.PA;
+                Warning(receveur.Stats.Prenom + " a infligé " + receveur.Stats.PA.ToString() + " en retour.");
+                if (attaquant.Stats.PVar <= 0)
+                {
+                    attaquant.Mourir();
+                    Warning(attaquant.Stats.Prenom + " est mort(e).");
+                }
+            }
+            else
+            {
+                Warning("Vous avez tué " + receveur.Stats.Prenom + " avec " + attaquant.Stats.Prenom);
+                receveur.Mourir();
+            }
+
+        }
+        receveur = null;
+        EstEnTrainDAttaquer = false;
+        CacherGrandeCarte();
+        AfficherPM();
+    }
+
     */
 }

@@ -19,8 +19,11 @@ public class GameManager : MonoBehaviour
     public GrosseCarte grosseCarte;
     public Carte CarteMontree;
     public Carte CarteCiblee; //Carte ciblée dans une attaque
+    public PlaceTerrain TerrainCiblee;
     public bool EstEnTrainDAttaquer = false;
+    public bool EstEnTrainDeSeDeplacer = false;
     public Sprite ImageDosCarte;
+    public Text WarningTexte;
     public Text ActionEnCoursTexte;
     public Text PMEnCoursTexte;
     public List<BoutonChoix> BoutonsDeJeu = new List<BoutonChoix>();
@@ -33,6 +36,8 @@ public class GameManager : MonoBehaviour
         //Demander quelles familles ils veulent jouer
         //NouvellePartie(); //Normalement on aura des choix donc il changera de place
         PMEnCoursTexte.text = "0".ToString();
+        Warning("Bienvenue sur le jeu !");
+        //System.Threading.Thread.Sleep(200);
     }
 
     public void NouvellePartie() // On récupèrera les joueurs et familles
@@ -86,7 +91,6 @@ public class GameManager : MonoBehaviour
         ChangerDeTour();
 
     }
-
     public void Piocher()
     {
         if (Pioche.Count >= 1 && JoueurActif.APioche == false)
@@ -111,12 +115,12 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+        else { Warning("Vous ne pouvez piocher qu'une fois par tour."); }
     }
-
     public void ChangerDeTour()
     {
 
-        Debug.Log("On change de tour : " + Tour + JoueurPassif);
+        Warning("On change de tour : " + Tour.ToString() + ". C'est au tour de : " + JoueurPassif.Prenom);
         JoueurActif.APioche = false;
         Tour++;
 
@@ -150,7 +154,7 @@ public class GameManager : MonoBehaviour
         SlotsCartes = JoueurActif.Deck;
         EnleverBonBoutons();
         if (Tour == 1 || Tour == 2) { PMEnCours = 3; StartCoroutine(ChoixDeStratege()); }
-        else if (Tour > 2) { PMEnCours = JoueurActif.Terrain[0].CartePlacee.Statistiques.PM; AfficherPM(); } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
+        else if (Tour > 2) { PMEnCours = JoueurActif.Terrain[0].CartePlacee.Stats.PM; AfficherPM(); } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
 
     }
     IEnumerator ChoixDeStratege() //Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
@@ -162,10 +166,14 @@ public class GameManager : MonoBehaviour
         JoueurActif.Terrain[0].CartePlacee.Stratege = true;
         AfficherPM();
     }
+
+    public void Warning(string texteDonne)
+    { WarningTexte.text = texteDonne.ToString(); }
+
     public void AfficherPM()
     {
         if (JoueurActif.Terrain[0].CartePlacee != null)
-        { PMEnCoursTexte.text = PMEnCours.ToString() + " / " + JoueurActif.Terrain[0].CartePlacee.Statistiques.PM.ToString(); }
+        { PMEnCoursTexte.text = PMEnCours.ToString() + " / " + JoueurActif.Terrain[0].CartePlacee.Stats.PM.ToString(); }
         else { PMEnCoursTexte.text = "Stratege".ToString(); }
     }
 
@@ -179,100 +187,118 @@ public class GameManager : MonoBehaviour
             ActionEnCoursTexte.text = "Choisissez une cible, une personne à attaquer".ToString();
             EnleverBonBoutons();
             StartCoroutine(AttendreCiblee());
-            PMEnCours--;
+            //if (CarteMontree.Appartenance == JoueurActif) { }
+            //else { StartCoroutine(AttendreCiblee(CarteCiblee, CarteMontree)); }
+
         }
+        else { Warning("Pas assez de PM pour attaquer"); }
 
     }
 
     IEnumerator AttendreCiblee()
     {
-
+        Warning("Choisissez avec qui " + CarteMontree.Stats.Prenom + " va se battre.");
         yield return new WaitUntil(() => CarteCiblee != null);
         FondColore.gameObject.transform.Translate(0, 50, 0f);
-        if (CarteCiblee.Appartenance == JoueurActif || !VerifierTerrainACote())// Vérifier que la carte est à côtée // Vérifier que la carte n'est pas liée
+        if (CarteCiblee.Appartenance == JoueurActif) // Vérifier que la carte est à côtée // Vérifier que la carte n'est pas liée
         {
-            Debug.Log("Echec de l'attaque");
+            Warning("Cette carte vous appartient !");
+        }
+        else if (!VerifierTerrainACote(CarteCiblee.PlaceTerrainOccupee))
+        {
+            Warning("Cette carte est trop loin !");
         }
         else
         {
-
+            PMEnCours--;
             CarteCiblee.GetComponent<UnityEngine.UI.Image>().sprite = CarteCiblee.ImageOriginale;
             CarteCiblee.EstCachee = false;
             CarteMontree.EstCachee = false;
-            CarteCiblee.Statistiques.PVar = CarteCiblee.Statistiques.PVar - CarteMontree.Statistiques.PA;
-            if (CarteCiblee.Statistiques.PVar > 0)
+            CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar - CarteMontree.Stats.PA;
+            Warning(CarteMontree.Stats.Prenom + " a infligé " + CarteMontree.Stats.PA.ToString() + " a " + CarteCiblee.Stats.Prenom);
+            if (CarteCiblee.Stats.PVar > 0)
             {
-                CarteMontree.Statistiques.PVar = CarteMontree.Statistiques.PVar - CarteCiblee.Statistiques.PA;
-                if (CarteMontree.Statistiques.PVar <= 0) { CarteMontree.Mourir(); }
+                CarteMontree.Stats.PVar = CarteMontree.Stats.PVar - CarteCiblee.Stats.PA;
+                Warning(CarteCiblee.Stats.Prenom + " est vivant(e) et a infligé " + CarteCiblee.Stats.PA.ToString() + " en retour.");
+                if (CarteMontree.Stats.PVar <= 0)
+                {
+                    CarteMontree.Mourir();
+                    Warning(CarteMontree.Stats.Prenom + " est mort(e).");
+                }
             }
-            else { CarteCiblee.Mourir(); }
-            Debug.Log("Réussite de l'attaque :" + CarteCiblee.Statistiques.PVar);
+            else
+            {
+                Warning("Vous avez tué " + CarteCiblee.Stats.Prenom + " avec " + CarteMontree.Stats.Prenom);
+                CarteCiblee.Mourir();
+            }
+
         }
         CarteCiblee = null;
         EstEnTrainDAttaquer = false;
         CacherGrandeCarte();
+        AfficherPM();
     }
 
     public void CacherGrandeCarte()
     {
-        grosseCarte.SeDecaler(CarteMontree.Statistiques, false);
+        grosseCarte.SeDecaler(CarteMontree.Stats, false);
         EnleverBonBoutons();
         CarteMontree.EstMontreeSurCarte = false;
         CarteMontree = null;
     }
 
-    protected bool VerifierTerrainACote() // C'est lonnng 
+    public bool VerifierTerrainACote(PlaceTerrain terrain) // C'est lonnng 
     {
         if (CarteMontree.PlaceTerrainOccupee.Id == 0)
         {
-            if (CarteCiblee.PlaceTerrainOccupee.Id == 1 || CarteCiblee.PlaceTerrainOccupee.Id == 2)
-            {
-                return true;
-            }
+            if (terrain.Id == 1 || terrain.Id == 2) { return true; }
         }
         else if (CarteMontree.PlaceTerrainOccupee.Id == 1)
         {
-            if (CarteCiblee.PlaceTerrainOccupee.Id == 0 || CarteCiblee.PlaceTerrainOccupee.Id == 2 || CarteCiblee.PlaceTerrainOccupee.Id == 4)
-            {
-                return true;
-            }
+            if (terrain.Id == 0 || terrain.Id == 2 || terrain.Id == 4) { return true; }
         }
         else if (CarteMontree.PlaceTerrainOccupee.Id == 2)
         {
-            if (CarteCiblee.PlaceTerrainOccupee.Id == 0 || CarteCiblee.PlaceTerrainOccupee.Id == 1 || CarteCiblee.PlaceTerrainOccupee.Id == 3)
-            {
-                return true;
-            }
+            if (terrain.Id == 0 || terrain.Id == 1 || terrain.Id == 3) { return true; }
         }
         else if (CarteMontree.PlaceTerrainOccupee.Id == 3)
         {
-            if (CarteCiblee.PlaceTerrainOccupee.Id == 5 || CarteCiblee.PlaceTerrainOccupee.Id == 2 || CarteCiblee.PlaceTerrainOccupee.Id == 4)
-            {
-                return true;
-            }
+            if (terrain.Id == 5 || terrain.Id == 2 || terrain.Id == 4) { return true; }
         }
         else if (CarteMontree.PlaceTerrainOccupee.Id == 4)
         {
-            if (CarteCiblee.PlaceTerrainOccupee.Id == 5 || CarteCiblee.PlaceTerrainOccupee.Id == 1 || CarteCiblee.PlaceTerrainOccupee.Id == 3)
-            {
-                return true;
-            }
+            if (terrain.Id == 5 || terrain.Id == 1 || terrain.Id == 3) { return true; }
         }
         else if (CarteMontree.PlaceTerrainOccupee.Id == 5)
         {
-            if (CarteCiblee.PlaceTerrainOccupee.Id == 3 || CarteCiblee.PlaceTerrainOccupee.Id == 4)
-            {
-                return true;
-            }
+            if (terrain.Id == 3 || terrain.Id == 4) { return true; }
         }
         return false;
     }
 
     public void SeDeplacer()
     {
+        if (PMEnCours >= 1)
+        {
+            EstEnTrainDeSeDeplacer = true;
+            FondColore.gameObject.transform.Translate(0, -50, 0f);
+            ActionEnCoursTexte.text = "Choisissez où vous déplacer".ToString();
+            EnleverBonBoutons();
+            StartCoroutine(AttendreTerrainCiblee());
+        }
+        else { Warning("Pas assez de PM pour se déplacer."); }
 
     }
-
+    IEnumerator AttendreTerrainCiblee()
+    {
+        yield return new WaitUntil(() => TerrainCiblee != null);
+        FondColore.gameObject.transform.Translate(0, 50, 0f);
+        TerrainCiblee = null;
+        EstEnTrainDeSeDeplacer = false;
+        Warning(CarteMontree.Stats.Prenom + " s'est déplacée.");
+        CacherGrandeCarte();
+        AfficherPM();
+    }
     public void Retirer()
     {
         if (PMEnCours >= 1)
@@ -282,7 +308,6 @@ public class GameManager : MonoBehaviour
                 if (slot.availableCarteSlots == true)
                 {
                     CarteMontree.gameObject.SetActive(true);
-
                     CarteMontree.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
                     slot.availableCarteSlots = false;
                     CarteMontree.PlaceOccupee = slot;
@@ -298,8 +323,10 @@ public class GameManager : MonoBehaviour
                     AfficherPM();
                     return;
                 }
+                else { Warning("Pas de place dans le deck."); }
             }
         }
+        else { Warning("Pas assez de PM pour retirer de carte."); }
 
     }
 
@@ -309,7 +336,6 @@ public class GameManager : MonoBehaviour
     }
     public void MontrerBoutonsChoix(string situation) //Finie
     {
-        Debug.Log(situation);
         switch (situation)
         {
             case "Allie":
