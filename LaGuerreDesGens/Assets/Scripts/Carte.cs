@@ -21,8 +21,8 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public Joueur Appartenance;
     public Vector2 PositionBase;
     public GameManager JeuEnCours;
-    public PlaceDeck PlaceOccupee;
-    public PlaceTerrain PlaceTerrainOccupee;
+    public PlaceDeck PlaceDeDeck;
+    public PlaceTerrain PlaceDeTerrain;
     public Sprite ImageOriginale;
 
 
@@ -58,7 +58,8 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     {
         if (JeuEnCours.JoueurActif.CartesPossedees.Contains(this))
         {
-            if (Stratege == true) { JeuEnCours.MontrerBoutonsChoix("StrategeAllie"); } // Il faudra rajouter carte seule a la fin ;-;
+            if (Stratege == true && !JeuEnCours.StrategeSeul()) { JeuEnCours.MontrerBoutonsChoix("StrategeAllie"); }
+            else if (Stratege == true && JeuEnCours.StrategeSeul()) { JeuEnCours.MontrerBoutonsChoix("StrategeSeul"); }
             else { JeuEnCours.MontrerBoutonsChoix("Allie"); }
         }
         else
@@ -72,10 +73,10 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     {
         Appartenance.CartesPossedees.Remove(this);
         Appartenance = null;
-        EstEnJeu = false;
-        this.gameObject.transform.Translate(0, 1000, 0f);
-        PlaceTerrainOccupee.CartePlacee = null;
-        PlaceTerrainOccupee = null;
+        EstEnJeu = true;
+        this.gameObject.transform.Translate(0, 1500, 0f);
+        PlaceDeTerrain.CartePlacee = null;
+        PlaceDeTerrain = null;
     }
 
     //Tout en dessous c'est pour déplacer la carte
@@ -107,11 +108,11 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         {
             rectTransform.anchoredPosition = PositionBase;
         }
-        else if (PlaceOccupee != null)
+        else if (PlaceDeDeck != null)
         {
-            PlaceOccupee.availableCarteSlots = true;
-            PlaceOccupee.CartePlacee = null;
-            PlaceOccupee = null;
+            PlaceDeDeck.availableCarteSlots = true;
+            PlaceDeDeck.CartePlacee = null;
+            PlaceDeDeck = null;
         }
     }
 

@@ -7,7 +7,6 @@ public class GameManager : MonoBehaviour
 {
 
     public List<Carte> Pioche = new List<Carte>();
-    public PlaceDeck PlacePioche;
     public Joueur J1;
     public Joueur J2;
     public Joueur JoueurActif;
@@ -58,7 +57,8 @@ public class GameManager : MonoBehaviour
 
         foreach (Carte carte in Pioche) //Ca donne les endroits du deck pour le jeu
         {
-            carte.PlaceOccupee = PlacePioche;
+            carte.PlaceDeDeck = null;
+            carte.PlaceDeTerrain = null;
             carte.Appartenance = null;
         }
         //Virer toutes les cartes des decks
@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
                     slot.availableCarteSlots = false;
                     slot.CartePlacee = randCarte;
                     randCarte.PositionBase = slot.rectTransform.anchoredPosition;
-                    randCarte.PlaceOccupee = slot;
+                    randCarte.PlaceDeDeck = slot;
                     randCarte.Appartenance = JoueurActif;
                     Pioche.Remove(randCarte);
                     JoueurActif.CartesPossedees.Add(randCarte);
@@ -166,7 +166,12 @@ public class GameManager : MonoBehaviour
         JoueurActif.Terrain[0].CartePlacee.Stratege = true;
         AfficherPM();
     }
-
+    public bool StrategeSeul()
+    {
+        if (JoueurActif.CartesPossedees.Count == 1 && Pioche.Count == 0)
+        { return true; }
+        return false;
+    }
     public void Warning(string texteDonne)
     { WarningTexte.text = texteDonne.ToString(); }
 
@@ -186,9 +191,12 @@ public class GameManager : MonoBehaviour
             FondColore.gameObject.transform.Translate(0, -50, 0f);
             ActionEnCoursTexte.text = "Choisissez une cible, une personne à attaquer".ToString();
             EnleverBonBoutons();
-            StartCoroutine(AttendreCiblee());
-            //if (CarteMontree.Appartenance == JoueurActif) { }
-            //else { StartCoroutine(AttendreCiblee(CarteCiblee, CarteMontree)); }
+            if (CarteMontree.Appartenance == JoueurActif) { StartCoroutine(AttendreCiblee()); }
+            /*else
+            {
+
+                StartCoroutine(AttendreCiblee());
+            }*/
 
         }
         else { Warning("Pas assez de PM pour attaquer"); }
@@ -204,7 +212,7 @@ public class GameManager : MonoBehaviour
         {
             Warning("Cette carte vous appartient !");
         }
-        else if (!VerifierTerrainACote(CarteCiblee.PlaceTerrainOccupee))
+        else if (!VerifierTerrainACote(CarteCiblee.PlaceDeTerrain))
         {
             Warning("Cette carte est trop loin !");
         }
@@ -231,7 +239,6 @@ public class GameManager : MonoBehaviour
                 Warning("Vous avez tué " + CarteCiblee.Stats.Prenom + " avec " + CarteMontree.Stats.Prenom);
                 CarteCiblee.Mourir();
             }
-
         }
         CarteCiblee = null;
         EstEnTrainDAttaquer = false;
@@ -247,32 +254,14 @@ public class GameManager : MonoBehaviour
         CarteMontree = null;
     }
 
-    public bool VerifierTerrainACote(PlaceTerrain terrain) // C'est lonnng 
+    public bool VerifierTerrainACote(PlaceTerrain terrain) // J'ai raccourci
     {
-        if (CarteMontree.PlaceTerrainOccupee.Id == 0)
-        {
-            if (terrain.Id == 1 || terrain.Id == 2) { return true; }
-        }
-        else if (CarteMontree.PlaceTerrainOccupee.Id == 1)
-        {
-            if (terrain.Id == 0 || terrain.Id == 2 || terrain.Id == 4) { return true; }
-        }
-        else if (CarteMontree.PlaceTerrainOccupee.Id == 2)
-        {
-            if (terrain.Id == 0 || terrain.Id == 1 || terrain.Id == 3) { return true; }
-        }
-        else if (CarteMontree.PlaceTerrainOccupee.Id == 3)
-        {
-            if (terrain.Id == 5 || terrain.Id == 2 || terrain.Id == 4) { return true; }
-        }
-        else if (CarteMontree.PlaceTerrainOccupee.Id == 4)
-        {
-            if (terrain.Id == 5 || terrain.Id == 1 || terrain.Id == 3) { return true; }
-        }
-        else if (CarteMontree.PlaceTerrainOccupee.Id == 5)
-        {
-            if (terrain.Id == 3 || terrain.Id == 4) { return true; }
-        }
+        if (CarteMontree.PlaceDeTerrain.Id == 0 && (terrain.Id == 1 || terrain.Id == 2)) { return true; }
+        else if (CarteMontree.PlaceDeTerrain.Id == 1 && (terrain.Id == 0 || terrain.Id == 2 || terrain.Id == 4)) { return true; }
+        else if (CarteMontree.PlaceDeTerrain.Id == 2 && (terrain.Id == 0 || terrain.Id == 1 || terrain.Id == 3)) { return true; }
+        else if (CarteMontree.PlaceDeTerrain.Id == 3 && (terrain.Id == 5 || terrain.Id == 2 || terrain.Id == 4)) { return true; }
+        else if (CarteMontree.PlaceDeTerrain.Id == 4 && (terrain.Id == 5 || terrain.Id == 1 || terrain.Id == 3)) { return true; }
+        else if (CarteMontree.PlaceDeTerrain.Id == 5 && (terrain.Id == 3 || terrain.Id == 4)) { return true; }
         return false;
     }
 
@@ -292,12 +281,16 @@ public class GameManager : MonoBehaviour
     IEnumerator AttendreTerrainCiblee()
     {
         yield return new WaitUntil(() => TerrainCiblee != null);
+        CarteMontree.PlaceDeTerrain.CartePlacee = null;
+        CarteMontree.PlaceDeTerrain = TerrainCiblee;
+        TerrainCiblee.CartePlacee = CarteMontree;
+        CarteMontree.GetComponent<RectTransform>().anchoredPosition = TerrainCiblee.GetComponent<RectTransform>().anchoredPosition;
+        Warning(CarteMontree.Stats.Prenom + " s'est déplacé(e).");
+        CacherGrandeCarte();
+        AfficherPM();
         FondColore.gameObject.transform.Translate(0, 50, 0f);
         TerrainCiblee = null;
         EstEnTrainDeSeDeplacer = false;
-        Warning(CarteMontree.Stats.Prenom + " s'est déplacée.");
-        CacherGrandeCarte();
-        AfficherPM();
     }
     public void Retirer()
     {
@@ -310,10 +303,10 @@ public class GameManager : MonoBehaviour
                     CarteMontree.gameObject.SetActive(true);
                     CarteMontree.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
                     slot.availableCarteSlots = false;
-                    CarteMontree.PlaceOccupee = slot;
+                    CarteMontree.PlaceDeDeck = slot;
                     slot.CartePlacee = CarteMontree;
-                    CarteMontree.PlaceTerrainOccupee.CartePlacee = null;
-                    CarteMontree.PlaceTerrainOccupee = null;
+                    CarteMontree.PlaceDeTerrain.CartePlacee = null;
+                    CarteMontree.PlaceDeTerrain = null;
                     CarteMontree.PositionBase = slot.rectTransform.anchoredPosition;
                     CarteMontree.EstCachee = false;
                     CarteMontree.EstEnJeu = false;
@@ -327,13 +320,12 @@ public class GameManager : MonoBehaviour
             }
         }
         else { Warning("Pas assez de PM pour retirer de carte."); }
-
     }
-
     public void Pouvoir()
     {
 
     }
+
     public void MontrerBoutonsChoix(string situation) //Finie
     {
         switch (situation)
@@ -377,34 +369,28 @@ public class GameManager : MonoBehaviour
     public void EchangerTerrainCoteCacherCartes()
     {
         //Le gros pavé pour échanger les terrains de côtés et cacher les cartes cachées.
-
         JoueurActif.Terrain[0].gameObject.transform.Translate(0, 660, 0f);
         if (JoueurActif.Terrain[0].CartePlacee != null) { JoueurActif.Terrain[0].CartePlacee.gameObject.transform.Translate(0, 660, 0f); }
         JoueurPassif.Terrain[0].gameObject.transform.Translate(0, -660, 0f);
         if (JoueurPassif.Terrain[0].CartePlacee != null) { JoueurPassif.Terrain[0].CartePlacee.gameObject.transform.Translate(0, -660, 0f); }
         for (int i = 1; i <= 2; i++)
-        {
-            if (JoueurActif.Terrain[i].CartePlacee != null)
-            {
-                JoueurActif.Terrain[i].CartePlacee.gameObject.transform.Translate(0, 460, 0f);
-                if (JoueurActif.Terrain[i].CartePlacee.EstCachee == true)
-                {
-                    JoueurActif.Terrain[i].CartePlacee.GetComponent<UnityEngine.UI.Image>().sprite = ImageDosCarte;
-                }
-            }
-            JoueurActif.Terrain[i].gameObject.transform.Translate(0, 460, 0f);
-        }
+        { EchangeTerrain(JoueurActif.Terrain[i].CartePlacee, JoueurActif, JoueurPassif, 1); JoueurActif.Terrain[i].gameObject.transform.Translate(0, 460, 0f); }
         for (int i = 1; i <= 2; i++)
+        { EchangeTerrain(JoueurPassif.Terrain[i].CartePlacee, JoueurActif, JoueurPassif, -1); JoueurPassif.Terrain[i].gameObject.transform.Translate(0, -460, 0f); }
+    }
+
+    public void EchangeTerrain(Carte carte, Joueur J1, Joueur J2, int n)
+    {
+        if (carte != null) // On regarde le terrain du joueur actif
         {
-            if (JoueurPassif.Terrain[i].CartePlacee != null)
-            {
-                JoueurPassif.Terrain[i].CartePlacee.gameObject.transform.Translate(0, -460, 0f);
-                if (JoueurPassif.Terrain[i].CartePlacee.EstCachee == true)
-                {
-                    JoueurPassif.Terrain[i].CartePlacee.GetComponent<UnityEngine.UI.Image>().sprite = JoueurPassif.Terrain[i].CartePlacee.ImageOriginale;
-                }
-            }
-            JoueurPassif.Terrain[i].gameObject.transform.Translate(0, -460, 0f);
+            carte.gameObject.transform.Translate(0, n * 460, 0f); // Je monte la carte avec
+            if (carte.EstCachee == true && carte.Appartenance == J1)
+            { carte.GetComponent<UnityEngine.UI.Image>().sprite = ImageDosCarte; }
+            else if (carte.EstCachee == true && carte.Appartenance == J2)
+            { carte.GetComponent<UnityEngine.UI.Image>().sprite = carte.ImageOriginale; }
         }
     }
+
+    public void ConditionDeVictoire()
+    { }
 }
