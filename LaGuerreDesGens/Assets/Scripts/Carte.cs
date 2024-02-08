@@ -130,7 +130,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
             {
                 JeuEnCours.grosseCarte.SeDecaler(Stats, true);
                 JeuEnCours.CarteMontree = this;
-                MettreBonBoutons();
+                if (JeuEnCours.Tour >= 2) { MettreBonBoutons(); }
                 EstMontreeSurCarte = true;
             }
             else if (Id == JeuEnCours.grosseCarte.Carte.Id) //Je cache la carte
@@ -142,7 +142,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
                 JeuEnCours.grosseCarte.SeDecaler(JeuEnCours.CarteMontree.Stats, false);
                 JeuEnCours.CarteMontree.EstMontreeSurCarte = false;
                 JeuEnCours.EnleverBonBoutons();
-                MettreBonBoutons();
+                if (JeuEnCours.Tour >= 2) { MettreBonBoutons(); }
                 JeuEnCours.grosseCarte.SeDecaler(Stats, true);
                 JeuEnCours.CarteMontree = this;
             }

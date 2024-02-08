@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public Carte CarteMontree;
     public Carte CarteCiblee; //Carte ciblée dans une attaque
     public PlaceTerrain TerrainCiblee;
+    public GameObject ToutTerrain;
     public bool EstEnTrainDAttaquer = false;
     public bool EstEnTrainDeSeDeplacer = false;
     public Sprite ImageDosCarte;
@@ -77,12 +78,15 @@ public class GameManager : MonoBehaviour
         */
 
         // La, on pioche les cartes du tout début de partie
+        PMEnCours = 4;
         for (int i = 0; i < 4; i++)
         {
             Piocher();
             JoueurActif.APioche = false;
+
         }
         ChangerDeTour();
+        PMEnCours = 4;
         for (int i = 0; i < 4; i++)
         {
             Piocher();
@@ -95,25 +99,34 @@ public class GameManager : MonoBehaviour
     {
         if (Pioche.Count >= 1 && JoueurActif.APioche == false)
         {
-            Carte randCarte = Pioche[Random.Range(0, Pioche.Count)];
-
-            foreach (PlaceDeck slot in SlotsCartes)
+            if (PMEnCours >= 1)
             {
-                if (slot.availableCarteSlots == true)
+                if (EstEnTrainDAttaquer == false && EstEnTrainDeSeDeplacer == false)
                 {
-                    randCarte.gameObject.SetActive(true);
-                    randCarte.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
-                    slot.availableCarteSlots = false;
-                    slot.CartePlacee = randCarte;
-                    randCarte.PositionBase = slot.rectTransform.anchoredPosition;
-                    randCarte.PlaceDeDeck = slot;
-                    randCarte.Appartenance = JoueurActif;
-                    Pioche.Remove(randCarte);
-                    JoueurActif.CartesPossedees.Add(randCarte);
-                    JoueurActif.APioche = true;
-                    return;
+                    Carte randCarte = Pioche[Random.Range(0, Pioche.Count)];
+                    foreach (PlaceDeck slot in SlotsCartes)
+                    {
+                        if (slot.availableCarteSlots == true)
+                        {
+                            PMEnCours--;
+                            AfficherPM();
+                            randCarte.gameObject.SetActive(true);
+                            randCarte.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
+                            slot.availableCarteSlots = false;
+                            slot.CartePlacee = randCarte;
+                            randCarte.PositionBase = slot.rectTransform.anchoredPosition;
+                            randCarte.PlaceDeDeck = slot;
+                            randCarte.Appartenance = JoueurActif;
+                            Pioche.Remove(randCarte);
+                            JoueurActif.CartesPossedees.Add(randCarte);
+                            JoueurActif.APioche = true;
+                            return;
+                        }
+                    }
                 }
+                else { Warning("Finissez votre action avant de piocher."); }
             }
+            else { Warning("Vous n'avez pas assez de PM pour piocher."); }
         }
         else { Warning("Vous ne pouvez piocher qu'une fois par tour."); }
     }
@@ -123,39 +136,31 @@ public class GameManager : MonoBehaviour
         Warning("On change de tour : " + Tour.ToString() + ". C'est au tour de : " + JoueurPassif.Prenom);
         JoueurActif.APioche = false;
         Tour++;
-
         foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
         {
             slot.gameObject.SetActive(false);
             if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(false); }
         }
-
         foreach (PlaceDeck slot in JoueurPassif.Deck) // On montre le deck de l'autre joueur
         {
             slot.gameObject.SetActive(true);
             if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(true); }
         }
 
-        EchangerTerrainCoteCacherCartes();
+        EchangeDeTerrain(JoueurActif, 1);
+        EchangeDeTerrain(JoueurPassif, -1);
 
         if (CarteMontree != null) { CacherGrandeCarte(); } //Retirer la carte montrée
 
-        if (Tour % 2 == 0) //Changement de joueur
-        {
-            JoueurActif = J2;
-            JoueurPassif = J1;
-        }
-        else
-        {
-            JoueurActif = J1;
-            JoueurPassif = J2;
-        }
+        if (Tour % 2 == 0) { JoueurActif = J2; JoueurPassif = J1; } //Changement de joueur
+        else { JoueurActif = J1; JoueurPassif = J2; }
 
         SlotsCartes = JoueurActif.Deck;
         EnleverBonBoutons();
         if (Tour == 1 || Tour == 2) { PMEnCours = 3; StartCoroutine(ChoixDeStratege()); }
-        else if (Tour > 2) { PMEnCours = JoueurActif.Terrain[0].CartePlacee.Stats.PM; AfficherPM(); } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
-
+        else if (Tour > 2 && JoueurActif.TrouverStratege() != null) { PMEnCours = JoueurActif.TrouverStratege().Stats.PM; } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
+        else { PMEnCours = 1; }
+        AfficherPM();
     }
     IEnumerator ChoixDeStratege() //Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
     {
@@ -164,7 +169,6 @@ public class GameManager : MonoBehaviour
         yield return new WaitUntil(() => JoueurActif.Terrain[0].CartePlacee != null);
         FondColore.gameObject.transform.Translate(0, 585, 0f);
         JoueurActif.Terrain[0].CartePlacee.Stratege = true;
-        AfficherPM();
     }
     public bool StrategeSeul()
     {
@@ -193,14 +197,9 @@ public class GameManager : MonoBehaviour
             EnleverBonBoutons();
             if (CarteMontree.Appartenance == JoueurActif) { StartCoroutine(AttendreCiblee()); }
             /*else
-            {
-
-                StartCoroutine(AttendreCiblee());
-            }*/
-
+            {StartCoroutine(AttendreCiblee()); }*/
         }
         else { Warning("Pas assez de PM pour attaquer"); }
-
     }
 
     IEnumerator AttendreCiblee()
@@ -244,6 +243,7 @@ public class GameManager : MonoBehaviour
         EstEnTrainDAttaquer = false;
         CacherGrandeCarte();
         AfficherPM();
+        ConditionDeVictoire();
     }
 
     public void CacherGrandeCarte()
@@ -276,21 +276,29 @@ public class GameManager : MonoBehaviour
             StartCoroutine(AttendreTerrainCiblee());
         }
         else { Warning("Pas assez de PM pour se déplacer."); }
-
     }
     IEnumerator AttendreTerrainCiblee()
     {
+        ToutTerrain.transform.SetAsLastSibling();
         yield return new WaitUntil(() => TerrainCiblee != null);
-        CarteMontree.PlaceDeTerrain.CartePlacee = null;
-        CarteMontree.PlaceDeTerrain = TerrainCiblee;
-        TerrainCiblee.CartePlacee = CarteMontree;
-        CarteMontree.GetComponent<RectTransform>().anchoredPosition = TerrainCiblee.GetComponent<RectTransform>().anchoredPosition;
-        Warning(CarteMontree.Stats.Prenom + " s'est déplacé(e).");
-        CacherGrandeCarte();
-        AfficherPM();
+        if (!VerifierTerrainACote(TerrainCiblee)) { Warning("Ce terrain est trop loin !"); }
+        else if (TerrainCiblee.CartePlacee != null)
+        { Warning("Il y a déjà quelqu'un ici !"); }
+        else
+        {
+            CarteMontree.PlaceDeTerrain.CartePlacee = null;
+            CarteMontree.PlaceDeTerrain = TerrainCiblee;
+            TerrainCiblee.CartePlacee = CarteMontree;
+            CarteMontree.GetComponent<RectTransform>().anchoredPosition = TerrainCiblee.GetComponent<RectTransform>().anchoredPosition;
+            PMEnCours--;
+            Warning(CarteMontree.Stats.Prenom + " s'est déplacé(e).");
+            AfficherPM();
+        }
+        ToutTerrain.transform.SetAsFirstSibling();
         FondColore.gameObject.transform.Translate(0, 50, 0f);
-        TerrainCiblee = null;
         EstEnTrainDeSeDeplacer = false;
+        TerrainCiblee = null;
+        CacherGrandeCarte();
     }
     public void Retirer()
     {
@@ -311,8 +319,8 @@ public class GameManager : MonoBehaviour
                     CarteMontree.EstCachee = false;
                     CarteMontree.EstEnJeu = false;
                     CarteMontree.Stratege = false;
-                    CacherGrandeCarte();
                     PMEnCours--;
+                    CacherGrandeCarte();
                     AfficherPM();
                     return;
                 }
@@ -360,37 +368,34 @@ public class GameManager : MonoBehaviour
     {
         foreach (BoutonChoix bouton in BoutonsDeJeu)
         {
-            if (bouton.EstMontree)
-            {
-                bouton.Cacher();
-            }
+            if (bouton.EstMontree) { bouton.Cacher(); }
         }
     }
-    public void EchangerTerrainCoteCacherCartes()
+    public void EchangeDeTerrain(Joueur J1, int n)
     {
-        //Le gros pavé pour échanger les terrains de côtés et cacher les cartes cachées.
-        JoueurActif.Terrain[0].gameObject.transform.Translate(0, 660, 0f);
-        if (JoueurActif.Terrain[0].CartePlacee != null) { JoueurActif.Terrain[0].CartePlacee.gameObject.transform.Translate(0, 660, 0f); }
-        JoueurPassif.Terrain[0].gameObject.transform.Translate(0, -660, 0f);
-        if (JoueurPassif.Terrain[0].CartePlacee != null) { JoueurPassif.Terrain[0].CartePlacee.gameObject.transform.Translate(0, -660, 0f); }
-        for (int i = 1; i <= 2; i++)
-        { EchangeTerrain(JoueurActif.Terrain[i].CartePlacee, JoueurActif, JoueurPassif, 1); JoueurActif.Terrain[i].gameObject.transform.Translate(0, 460, 0f); }
-        for (int i = 1; i <= 2; i++)
-        { EchangeTerrain(JoueurPassif.Terrain[i].CartePlacee, JoueurActif, JoueurPassif, -1); JoueurPassif.Terrain[i].gameObject.transform.Translate(0, -460, 0f); }
-    }
-
-    public void EchangeTerrain(Carte carte, Joueur J1, Joueur J2, int n)
-    {
-        if (carte != null) // On regarde le terrain du joueur actif
+        Carte carte;
+        foreach (PlaceTerrain terrain in J1.Terrain)
         {
-            carte.gameObject.transform.Translate(0, n * 460, 0f); // Je monte la carte avec
-            if (carte.EstCachee == true && carte.Appartenance == J1)
-            { carte.GetComponent<UnityEngine.UI.Image>().sprite = ImageDosCarte; }
-            else if (carte.EstCachee == true && carte.Appartenance == J2)
-            { carte.GetComponent<UnityEngine.UI.Image>().sprite = carte.ImageOriginale; }
+            if (terrain.CartePlacee != null)
+            {
+                carte = terrain.CartePlacee;
+                if (terrain == J1.Terrain[0]) { carte.gameObject.transform.Translate(0, n * 660, 0f); } //Bouger la carte
+                else { carte.gameObject.transform.Translate(0, n * 460, 0f); }
+
+                if (carte.EstCachee == true && carte.Appartenance == JoueurActif)
+                { carte.GetComponent<UnityEngine.UI.Image>().sprite = ImageDosCarte; } //Cacher carte
+                else if ((carte.EstCachee == true && carte.Appartenance == JoueurPassif) || carte.Stratege == true)
+                { carte.GetComponent<UnityEngine.UI.Image>().sprite = carte.ImageOriginale; } //Montrer carte
+            }
+            if (terrain == J1.Terrain[0]) { terrain.gameObject.transform.Translate(0, n * 660, 0f); }
+            else { terrain.gameObject.transform.Translate(0, n * 460, 0f); }
         }
     }
-
     public void ConditionDeVictoire()
-    { }
+    {
+        if (Pioche.Count == 0 && JoueurActif.CartesPossedees.Count == 0)
+        { Warning("Le jeu est terminé. " + JoueurPassif.Prenom + " gagne avec " + JoueurPassif.CartesPossedees.Count + " carte(s) restantes."); }
+        else if (Pioche.Count == 0 && JoueurPassif.CartesPossedees.Count == 0)
+        { Warning("Le jeu est terminé. " + JoueurActif.Prenom + " gagne avec " + JoueurActif.CartesPossedees.Count + " carte(s) restantes."); }
+    }
 }

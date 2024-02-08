@@ -16,8 +16,8 @@ MonoBehaviour:
   Prenom: Sosara
   Image: {fileID: 21300000, guid: d7aa9758b2932704e9afe10ea17feb2d, type: 3}
   PM: 3.5
-  PV: 30
-  PVar: 30
+  PV: 20
+  PVar: 0
   PA: 10
   IdPouvoir: 3
   Pouvoir: Soigne 20 PV
