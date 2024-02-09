@@ -4,12 +4,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
 {
-    public Carte CartePlacee;
     public int Id;
+    public Carte CartePlacee;
     public GameManager JeuEnCours;
     public Joueur Appartenance;
 
-
+    public void Start()
+    { CartePlacee = null; }
     public void OnDrop(PointerEventData eventData)
     {
         Debug.Log("OnDrop");
@@ -34,12 +35,5 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
     public void OnPointerDown(PointerEventData eventData)
     {
         if (JeuEnCours.EstEnTrainDeSeDeplacer == true) { JeuEnCours.TerrainCiblee = this; }
-        /*if (JeuEnCours.EstEnTrainDeSeDeplacer == true && CartePlacee == null)
-        {
-            if (JeuEnCours.VerifierTerrainACote(this)) { JeuEnCours.TerrainCiblee = this; }
-            else { JeuEnCours.Warning("Ce terrain est trop loin !"); }
-        }
-        else if (JeuEnCours.EstEnTrainDeSeDeplacer == true && CartePlacee != null)
-        { JeuEnCours.Warning("Il y a déjà quelqu'un ici !"); }*/
     }
 }

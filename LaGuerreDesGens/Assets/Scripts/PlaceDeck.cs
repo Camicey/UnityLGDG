@@ -11,10 +11,11 @@ public class PlaceDeck : MonoBehaviour
     public RectTransform rectTransform;
 
 
-    void Start()
+    public void Start()
     {
         availableCarteSlots = true; //Ne pas enlever, bug sinon
         rectTransform = GetComponent<RectTransform>();
+        CartePlacee = null;
     }
 
 }

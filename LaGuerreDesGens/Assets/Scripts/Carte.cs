@@ -17,6 +17,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public bool EstMontreeSurCarte = false; //Est montrée sur la grande carte
     public bool EstEnJeu = false; //Est sur le plateau
     public bool Stratege = false;
+    public bool AUtilisePouvoir = false;
 
     public Joueur Appartenance;
     public Vector2 PositionBase;
@@ -27,12 +28,29 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         PositionBase = rectTransform.anchoredPosition;
         Stats.PVar = Stats.PV;
+        JeuEnCours.ToutesLesCartes.Add(this);
+    }
+
+    public void Initialiser()
+    {
+        Stats.PVar = Stats.PV;
+        PlaceDeDeck = null;
+        PlaceDeTerrain = null;
+        Appartenance = null;
+        EstMontreeSurCarte = false;
+        EstCachee = false;
+        EstEnJeu = false;
+        Stratege = false;
+        AUtilisePouvoir = false;
+        GetComponent<RectTransform>().anchoredPosition = new Vector2(-1200, 0);
+        if (Stats.Famille == JeuEnCours.FamillesChoisies[0] || Stats.Famille == JeuEnCours.FamillesChoisies[1])
+        { JeuEnCours.Pioche.Add(this); }
     }
 
     public void Agrandir() // Agrandir la carte.
@@ -130,7 +148,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
             {
                 JeuEnCours.grosseCarte.SeDecaler(Stats, true);
                 JeuEnCours.CarteMontree = this;
-                if (JeuEnCours.Tour >= 2) { MettreBonBoutons(); }
+                if (JeuEnCours.Tour > 2) { MettreBonBoutons(); }
                 EstMontreeSurCarte = true;
             }
             else if (Id == JeuEnCours.grosseCarte.Carte.Id) //Je cache la carte
@@ -142,7 +160,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
                 JeuEnCours.grosseCarte.SeDecaler(JeuEnCours.CarteMontree.Stats, false);
                 JeuEnCours.CarteMontree.EstMontreeSurCarte = false;
                 JeuEnCours.EnleverBonBoutons();
-                if (JeuEnCours.Tour >= 2) { MettreBonBoutons(); }
+                if (JeuEnCours.Tour > 2) { MettreBonBoutons(); }
                 JeuEnCours.grosseCarte.SeDecaler(Stats, true);
                 JeuEnCours.CarteMontree = this;
             }

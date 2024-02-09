@@ -18,6 +18,10 @@ public class Joueur : MonoBehaviour
         { if (carte.Stratege == true) { return carte; } }
         return null;
     }
-
+    public void Start()
+    {
+        CartesPossedees.Clear();
+        APioche = false;
+    }
 }
 
