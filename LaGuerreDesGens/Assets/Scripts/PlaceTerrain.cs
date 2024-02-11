@@ -29,11 +29,17 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
             JeuEnCours.PMEnCours -= 1;
             JeuEnCours.AfficherPM();
         }
-        else { Debug.Log("Oh oh problem for you"); }
+        else
+        {
+            Debug.Log("Oh oh problem for you");
+            Debug.Log(eventData.pointerDrag + (Appartenance == JeuEnCours.JoueurActif).ToString() + 
+            eventData.pointerDrag.GetComponent<Carte>().EstEnJeu +
+            (eventData.pointerDrag.GetComponent<Carte>().Appartenance == JeuEnCours.JoueurActif).ToString() + (JeuEnCours.PMEnCours >= 1).ToString());
+        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (JeuEnCours.EstEnTrainDeSeDeplacer == true) { JeuEnCours.TerrainCiblee = this; }
+        if (JeuEnCours.EnTrainCibleTerrain == true) { JeuEnCours.TerrainCiblee = this; }
     }
 }

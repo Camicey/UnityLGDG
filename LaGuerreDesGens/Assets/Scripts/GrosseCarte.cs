@@ -31,8 +31,8 @@ public class GrosseCarte : MonoBehaviour
         PMT.text = Carte.PM.ToString();
         PVT.text = Carte.PVar.ToString();
         PAT.text = Carte.PA.ToString();
-        PouvoirT.text = Carte.Pouvoir;
-        CoutPouvoirT.text = Carte.CoutPouvoir.ToString() + "PM";
+        PouvoirT.text = Carte.PouvoirVar;
+        CoutPouvoirT.text = Carte.CoutPouvoirVar.ToString() + "PM";
         FamilleImageT.sprite = Carte.FamilleImage;
         TypeImageT.sprite = Carte.TypeImage;
         LiensT.text = MontrerLiens();

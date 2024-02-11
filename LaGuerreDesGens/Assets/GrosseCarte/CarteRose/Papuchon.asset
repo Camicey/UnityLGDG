@@ -17,13 +17,17 @@ MonoBehaviour:
   Image: {fileID: 21300000, guid: c5538eb628415e64c8f2fc6ec2c22a82, type: 3}
   PM: 0
   PV: 20
-  PVar: 20
+  PVar: 0
   PA: 5
   IdPouvoir: 13
+  IdPouvoirVar: 13
   Pouvoir: "Si tu\xE9, revient dans la pioche. Si pioche vide, d\xE9fausser."
+  PouvoirVar: "Si tu\xE9, revient dans la pioche. Si pioche vide, d\xE9fausser."
   CoutPouvoir: 0
+  CoutPouvoirVar: 0
   Famille: Rose
   FamilleImage: {fileID: 21300000, guid: be93a18f5969f134f8c34efa8554bec9, type: 3}
-  Type: "Pi\xE8ge"
+  Type: Piege
   TypeImage: {fileID: 21300000, guid: 407fa94bfe60c344faecdcfc8908c9b7, type: 3}
   liens: []
+  liensvar: []

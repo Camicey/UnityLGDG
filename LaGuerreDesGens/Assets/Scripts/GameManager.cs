@@ -18,11 +18,11 @@ public class GameManager : MonoBehaviour
     public GrosseCarte grosseCarte;
     public Carte CarteMontree;
     public Carte CarteCiblee; //Carte ciblée dans une attaque
+    public int DegatCiblee;
     public PlaceTerrain TerrainCiblee;
     public GameObject ToutTerrain;
-    public bool EstEnTrainDAttaquer = false;
-    public bool EstEnTrainDeSeDeplacer = false;
-    public bool EstEnTrainDePouvoir = false;
+    public bool EnTrainCibleCarte = false;
+    public bool EnTrainCibleTerrain = false;
     public Sprite ImageDosCarte;
     public Text WarningTexte;
     public Text ActionEnCoursTexte;
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     public List<string> FamillesChoisies = new List<string>();
     public string stringToEdit = "Hello \nI've got 2 lines...";
 
-
+    public Pouvoir PW;
     public GameObject FondColore;
 
     void Start()
@@ -54,15 +54,15 @@ public class GameManager : MonoBehaviour
     }
     public void NouvellePartie() // On récupèrera les joueurs et familles
     {
+        if (JoueurActif == J2) { ChangerDeTour(); }
         JoueurActif = J1; //Ce sera une création de joueur à la place
         JoueurPassif = J2;
         Tour = -1;
         CarteCiblee = null;
         TerrainCiblee = null;
         CarteMontree = null;
-        EstEnTrainDAttaquer = false;
-        EstEnTrainDeSeDeplacer = false;
-        EstEnTrainDePouvoir = false;
+        EnTrainCibleCarte = false;
+        EnTrainCibleTerrain = false;
         SlotsCartes = JoueurActif.Deck;
         Pioche.Clear();
         Defausse.Clear();
@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
         foreach (PlaceTerrain slot in JoueurPassif.Terrain) { slot.Start(); }
         foreach (Carte carte in ToutesLesCartes) // Mettre les cartes dans la pioche
         { carte.Initialiser(); }
-
+        if (CarteMontree != null) { CacherGrandeCarte(); }
         // La, on pioche les cartes du tout début de partie
         PMEnCours = 4;
         for (int i = 0; i < 4; i++)
@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
         {
             if (PMEnCours >= 1)
             {
-                if (EstEnTrainDAttaquer == false && EstEnTrainDeSeDeplacer == false)
+                if (EnTrainCibleCarte == false && EnTrainCibleTerrain == false)
                 {
                     Carte randCarte = Pioche[Random.Range(0, Pioche.Count)];
                     foreach (PlaceDeck slot in SlotsCartes)
@@ -184,8 +184,7 @@ public class GameManager : MonoBehaviour
         { return true; }
         return false;
     }
-    public void Warning(string texteDonne)
-    { WarningTexte.text = texteDonne.ToString(); }
+    public void Warning(string texteDonne) { WarningTexte.text = texteDonne.ToString(); }
 
     public void AfficherPM()
     {
@@ -198,7 +197,7 @@ public class GameManager : MonoBehaviour
     {
         if (PMEnCours >= 1)
         {
-            EstEnTrainDAttaquer = true;
+            EnTrainCibleCarte = true;
             //Ecran derrière, possibilité de tapper. Tant qu'on ne choisit pas
             FondColore.gameObject.transform.Translate(0, -50, 0f);
             ActionEnCoursTexte.text = "Choisissez une cible, une personne à attaquer".ToString();
@@ -226,16 +225,14 @@ public class GameManager : MonoBehaviour
         {
             Warning(CarteMontree.Stats.Prenom + " apperçoit " + CarteCiblee.Stats.Prenom + " et refuse de se battre.");
             PMEnCours--;
-            CarteCiblee.GetComponent<UnityEngine.UI.Image>().sprite = CarteCiblee.ImageOriginale;
-            CarteCiblee.EstCachee = false;
-            CarteMontree.EstCachee = false;
+            CarteCiblee.Retourner();
+            CarteMontree.Retourner();
         }
         else
         {
             PMEnCours--;
-            CarteCiblee.GetComponent<UnityEngine.UI.Image>().sprite = CarteCiblee.ImageOriginale;
-            CarteCiblee.EstCachee = false;
-            CarteMontree.EstCachee = false;
+            CarteCiblee.Retourner();
+            CarteMontree.Retourner();
             CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar - CarteMontree.Stats.PA;
             Warning(CarteMontree.Stats.Prenom + " a infligé " + CarteMontree.Stats.PA.ToString() + " a " + CarteCiblee.Stats.Prenom);
             if (CarteCiblee.Stats.PVar > 0)
@@ -255,7 +252,7 @@ public class GameManager : MonoBehaviour
             }
         }
         CarteCiblee = null;
-        EstEnTrainDAttaquer = false;
+        EnTrainCibleCarte = false;
         CacherGrandeCarte();
         AfficherPM();
         ConditionDeVictoire();
@@ -264,7 +261,7 @@ public class GameManager : MonoBehaviour
     {
         if (PMEnCours >= 1)
         {
-            EstEnTrainDeSeDeplacer = true;
+            EnTrainCibleTerrain = true;
             FondColore.gameObject.transform.Translate(0, -50, 0f);
             ActionEnCoursTexte.text = "Choisissez où vous déplacer".ToString();
             EnleverBonBoutons();
@@ -291,7 +288,7 @@ public class GameManager : MonoBehaviour
         }
         ToutTerrain.transform.SetAsFirstSibling();
         FondColore.gameObject.transform.Translate(0, 50, 0f);
-        EstEnTrainDeSeDeplacer = false;
+        EnTrainCibleTerrain = false;
         TerrainCiblee = null;
         CacherGrandeCarte();
     }
@@ -325,95 +322,11 @@ public class GameManager : MonoBehaviour
         }
         else { Warning("Pas assez de PM pour retirer de carte."); }
     }
-    public void Pouvoir()
-    {
-        if (PMEnCours - CarteMontree.Stats.CoutPouvoir >= 0 && CarteMontree.AUtilisePouvoir == false)
-        {
-
-            EstEnTrainDePouvoir = true;
-            switch (CarteMontree.Stats.IdPouvoir)
-            {
-                case 0:
-                    break;
-                case 1:
-                    //ChoixDeGens
-                    //ChangerPouvoir(0, Cible: Carte);
-                    break;
-                case 2:
-                    //ChoixDeGens
-                    //Cible("PV", 10, false);
-                    break;
-                case 3:
-                    //ChoixDeGens
-                    //Cible("PV", 20, false);
-                    break;
-                case 4:
-                    //ChoixDeGens
-                    //Cible(“PV”, -10, False);
-                    //Imobilise(1);
-                    break;
-                case 5:
-                    //ChoixDeGens
-                    //CouperLien(Cible: Carte);
-                    break;
-                case 6:
-                    //ChoixDeGens
-                    //CreerLien(Cible1, Cible2);
-                    break;
-                case 7:
-                    //SeDeplacer(Case Départ, CaseArrivee);
-                    break;
-                case 8: //Echanger Ne marche pas
-                    EstEnTrainDAttaquer = true;
-                    FondColore.gameObject.transform.Translate(0, -50, 0f);
-                    ActionEnCoursTexte.text = "Choisissez avec qui vous voulez échanger votre carte".ToString();
-                    EnleverBonBoutons();
-                    StartCoroutine(AttendreCibleeEchange());
-                    break;
-                case 9:
-                    //ChoixDeGens
-                    CarteMontree.Mourir();
-                    //CarteCiblee.Mourir();
-                    break;/*
-                case 10: // Retourner toutes les cartes
-                    foreach (PlaceTerrain terrain in JoueurActif.Terrain)
-                    { if (terrain.CartePlacee != null) { terrain.CartePlacee.Retourner(); } }
-                    foreach (PlaceTerrain terrain in JoueurPassif.Terrain)
-                    { if (terrain.CartePlacee != null) { terrain.CartePlacee.Retourner(); } }
-                    break;
-                case 11: // Retourner Famille
-                    //Retourner(Famille);
-                    break;
-                case 12: //Retourner Piege
-                    foreach (PlaceTerrain terrain in JoueurActif.Terrain)
-                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.Retourner(); } }
-                    foreach (PlaceTerrain terrain in JoueurPassif.Terrain)
-                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.Retourner(); } }
-                    break;*/
-                case 13:
-                    //RevenirPioche();
-                    break;
-                default:
-                    break;
-            }
-            if (CarteMontree.Stats.IdPouvoir != 8)
-            {
-                PMEnCours = PMEnCours - CarteMontree.Stats.CoutPouvoir;
-                CarteMontree.AUtilisePouvoir = true;
-            }
-            else { }
-
-            EstEnTrainDePouvoir = false;
-            AfficherPM();
-        }
-        else { Warning("Pas assez de PM pour utiliser ce pouvoir."); }
-    }
-
     public void Echanger()
     {
         if (PMEnCours >= 2)
         {
-            EstEnTrainDAttaquer = true;
+            EnTrainCibleCarte = true;
             FondColore.gameObject.transform.Translate(0, -50, 0f);
             ActionEnCoursTexte.text = "Choisissez avec qui vous voulez échanger votre carte".ToString();
             EnleverBonBoutons();
@@ -421,7 +334,6 @@ public class GameManager : MonoBehaviour
         }
         else { Warning("Pas assez de PM pour échanger les cartes."); }
     }
-
     IEnumerator AttendreCibleeEchange()
     {
         Warning("Choisissez avec qui " + CarteMontree.Stats.Prenom + " va échanger de place.");
@@ -456,7 +368,7 @@ public class GameManager : MonoBehaviour
         }
         CarteCiblee = null;
         TerrainCiblee = null;
-        EstEnTrainDAttaquer = false;
+        EnTrainCibleCarte = false;
         CacherGrandeCarte();
         AfficherPM();
     }
@@ -483,14 +395,8 @@ public class GameManager : MonoBehaviour
                 break;
             case "StrategeAllie":
                 BoutonsDeJeu[0].Montrer();
-                BoutonsDeJeu[4].Montrer(); //Retirer pour stratege
                 BoutonsDeJeu[3].Montrer();
-                break;
-            case "Ennemi":
-                BoutonsDeJeu[0].Montrer(); //Mauvaise attaque attention
-                break;
-            case "StrategeEnnemi":
-                BoutonsDeJeu[0].Montrer(); //Mauvaise attaque attention
+                BoutonsDeJeu[4].Montrer(); //Retirer pour stratege
                 break;
             case "StrategeSeul":
                 BoutonsDeJeu[0].Montrer();
@@ -499,7 +405,6 @@ public class GameManager : MonoBehaviour
             default:
                 break;
         }
-
     }
     public void EnleverBonBoutons()
     {
@@ -542,4 +447,138 @@ public class GameManager : MonoBehaviour
         else if (Pioche.Count == 0 && JoueurPassif.CartesPossedees.Count == 0)
         { Warning("Le jeu est terminé. " + JoueurActif.Prenom + " gagne avec " + JoueurActif.CartesPossedees.Count + " carte(s) restantes."); }
     }
+
+    public void Pouvoir()
+    {
+        if (PMEnCours - CarteMontree.Stats.CoutPouvoirVar >= 0 && CarteMontree.AUtilisePouvoir == false)
+        {
+            switch (CarteMontree.Stats.IdPouvoir)
+            {
+                case 0:
+                    break;
+                case 1:
+                    StartCoroutine(ChangerPouvoir()); //ChoixDeGens
+                    break;
+                case 2: //Guérir 10
+                    Cible("PV", 10, false);
+                    break;
+                case 3: //Guérir 20
+                    Cible("PV", 20, false);
+                    break;
+                case 4: //Enlever 10 a lui même
+                    //Cible("PV", -10, false);
+                    //Imobilise(1);
+                    break;
+                case 5: //Couper les liens
+                    StartCoroutine(CouperLiens());
+                    break;
+                case 6:
+                    //CreerLien(Cible1, Cible2);
+                    break;
+                case 7:
+                    //SeDeplacer(Case Départ, CaseArrivee);
+                    break;
+                case 8: //Echanger Ne marche pas beaucoup
+                    CommencerPouvoir();
+                    ActionEnCoursTexte.text = "Choisissez avec qui vous voulez échanger votre carte".ToString();
+                    StartCoroutine(AttendreCibleeEchange());
+                    break;
+                case 9: //Mourir Cible et Mourir
+                    StartCoroutine(MourirCiblee());
+                    break;
+                case 10: // Retourner toutes les cartes
+                    foreach (PlaceTerrain terrain in JoueurActif.Terrain)
+                    { if (terrain.CartePlacee != null) { terrain.CartePlacee.Retourner(); } }
+                    foreach (PlaceTerrain terrain in JoueurPassif.Terrain)
+                    { if (terrain.CartePlacee != null) { terrain.CartePlacee.Retourner(); } }
+                    Warning("Tout le monde a été découvert par " + CarteMontree.Stats.Prenom);
+                    break;
+                case 11: // Retourner Famille
+                    //Retourner(Famille);
+                    break;
+                case 12: //Retourner Piege
+                    foreach (PlaceTerrain terrain in JoueurActif.Terrain)
+                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.Retourner(); } }
+                    foreach (PlaceTerrain terrain in JoueurPassif.Terrain)
+                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.Retourner(); } }
+                    Warning("Tout les pièges ont été découvert par " + CarteMontree.Stats.Prenom);
+                    break;
+                case 13:
+                    //RevenirPioche();
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        else { Warning("Pas assez de PM pour utiliser ce pouvoir."); }
+        ConditionDeVictoire();
+    }
+
+    private void Cible(string p, int degat, bool recc)
+    {
+        DegatCiblee = degat;
+        StartCoroutine(CiblePV());
+    }
+    public IEnumerator CiblePV()
+    {
+        CommencerPouvoir("Choisissez avec qui va avoir" + DegatCiblee + " PV.");
+        yield return new WaitUntil(() => CarteCiblee != null);
+        Warning(CarteCiblee.Stats.Prenom + " a eu une modification de " + DegatCiblee + " PV.");
+        CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar + DegatCiblee;
+        if (CarteCiblee.Stats.PVar <= 0)
+        {
+            CarteCiblee.Mourir();
+            Warning(CarteCiblee.Stats.Prenom + " est mort(e).");
+        }
+        else if (CarteCiblee.Stats.PVar > CarteCiblee.Stats.PV) { CarteCiblee.Stats.PVar = CarteCiblee.Stats.PV; }
+        FinirPouvoir();
+    }
+    public IEnumerator ChangerPouvoir()
+    {
+        CommencerPouvoir("Choisissez avec qui va perdre son pouvoir.");
+        yield return new WaitUntil(() => CarteCiblee != null);
+        Warning(CarteCiblee.Stats.Prenom + " a perdu son pouvoir.");
+        CarteCiblee.Retourner();
+        CarteCiblee.Stats.PouvoirVar = "Plus de pouvoir.";
+        CarteCiblee.Stats.IdPouvoirVar = 0;
+        CarteCiblee.Stats.CoutPouvoirVar = 0;
+        FinirPouvoir();
+    }
+    public IEnumerator MourirCiblee()
+    {
+        CommencerPouvoir("Choisissez avec qui va mourir avec " + CarteMontree.Stats.Prenom);
+        yield return new WaitUntil(() => CarteCiblee != null);
+        Warning(CarteCiblee.Stats.Prenom + " est mort avec " + CarteMontree.Stats.Prenom);
+        CarteCiblee.Mourir();
+        CarteMontree.Mourir();
+        FinirPouvoir();
+    }
+    IEnumerator CouperLiens()
+    {
+        CommencerPouvoir("Choisissez qui va perdre tous ses liens par " + CarteMontree.Stats.Prenom);
+        yield return new WaitUntil(() => CarteCiblee != null);
+        Warning(CarteCiblee.Stats.Prenom + " a perdu tous ses liens.");
+        CarteCiblee.Liens.Clear();
+        CarteCiblee.Stats.liens.Clear();
+        FinirPouvoir();
+    }
+    private void CommencerPouvoir(string texte)
+    {
+        FondColore.gameObject.transform.Translate(0, -50, 0f);
+        EnTrainCibleCarte = true;
+        EnleverBonBoutons();
+        Warning(texte);
+    }
+    private void FinirPouvoir()
+    {
+        FondColore.gameObject.transform.Translate(0, 50, 0f);
+        CarteCiblee = null;
+        CarteMontree.AUtilisePouvoir = true;
+        EnTrainCibleCarte = false;
+        CacherGrandeCarte();
+        if (CarteMontree.Stats.IdPouvoir != 8) { PMEnCours = PMEnCours - CarteMontree.Stats.CoutPouvoirVar; }
+        AfficherPM();
+    }
+
 }

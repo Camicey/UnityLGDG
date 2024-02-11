@@ -40,6 +40,10 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public void Initialiser()
     {
         Stats.PVar = Stats.PV;
+        Stats.PouvoirVar = Stats.Pouvoir;
+        Stats.IdPouvoirVar = Stats.IdPouvoir;
+        Stats.CoutPouvoirVar = Stats.CoutPouvoir;
+        Stats.liensvar = Stats.liens;
         PlaceDeDeck = null;
         PlaceDeTerrain = null;
         Appartenance = null;
@@ -97,6 +101,12 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         PlaceDeTerrain = null;
     }
 
+    public void Retourner()
+    {
+        GetComponent<UnityEngine.UI.Image>().sprite = ImageOriginale;
+        EstCachee = false;
+    }
+
     //Tout en dessous c'est pour déplacer la carte
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -113,9 +123,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public void OnDrag(PointerEventData eventData)
     {
         if (GetComponent<Carte>().EstEnJeu == false)
-        {
-            rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
-        }
+        { rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor; }
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -137,7 +145,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public void OnPointerDown(PointerEventData eventData)
     {
         Debug.Log("OnPointerDown");
-        if (JeuEnCours.EstEnTrainDAttaquer == true && EstEnJeu == true)
+        if (JeuEnCours.EnTrainCibleCarte == true && EstEnJeu == true)
         {
             JeuEnCours.CarteCiblee = this;
         }
@@ -167,18 +175,10 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
             Debug.Log("Une carte est montrée :" + (JeuEnCours.CarteMontree != null));
         }
         else if (EstCachee == true)
-        {
-            JeuEnCours.Warning("Vous ne pouvez pas voir cette carte.");
-        }
-
-
-
+        { JeuEnCours.Warning("Vous ne pouvez pas voir cette carte."); }
     }
 
     public void OnDrop(PointerEventData eventData)
-    {
-        Debug.Log("On dirait une erreur.");
-        //throw new System.NotImplementedException();
-    }
+    { Debug.Log("On dirait une erreur."); }
 
 }
