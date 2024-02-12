@@ -32,8 +32,6 @@ public class GameManager : MonoBehaviour
     public List<Carte> ToutesLesCartes = new List<Carte>();
     public List<string> FamillesChoisies = new List<string>();
     public string stringToEdit = "Hello \nI've got 2 lines...";
-
-    public Pouvoir PW;
     public GameObject FondColore;
 
     void Start()
@@ -153,7 +151,10 @@ public class GameManager : MonoBehaviour
             if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(true); }
         }
         foreach (Carte carte in ToutesLesCartes)
-        { carte.AUtilisePouvoir = false; }
+        {
+            carte.AUtilisePouvoir = false;
+            if (carte.Immobile > 0) { carte.Immobile--; } //C'est pour le pouvoir 4
+        }
         EchangeDeTerrain(JoueurActif, 1);
         EchangeDeTerrain(JoueurPassif, -1);
 
@@ -214,13 +215,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitUntil(() => CarteCiblee != null);
         FondColore.gameObject.transform.Translate(0, 50, 0f);
         if (CarteCiblee.Appartenance == JoueurActif) // Vérifier que la carte est à côtée // Vérifier que la carte n'est pas liée
-        {
-            Warning("Cette carte vous appartient !");
-        }
+        { Warning("Cette carte vous appartient !"); }
         else if (!VerifierTerrainACote(CarteCiblee.PlaceDeTerrain))
-        {
-            Warning("Cette carte est trop loin !");
-        }
+        { Warning("Cette carte est trop loin !"); }
         else if (CarteMontree.Liens.Contains(CarteCiblee))
         {
             Warning(CarteMontree.Stats.Prenom + " apperçoit " + CarteCiblee.Stats.Prenom + " et refuse de se battre.");
@@ -240,16 +237,9 @@ public class GameManager : MonoBehaviour
                 CarteMontree.Stats.PVar = CarteMontree.Stats.PVar - CarteCiblee.Stats.PA;
                 Warning(CarteCiblee.Stats.Prenom + " est vivant(e) et a infligé " + CarteCiblee.Stats.PA.ToString() + " en retour.");
                 if (CarteMontree.Stats.PVar <= 0)
-                {
-                    CarteMontree.Mourir();
-                    Warning(CarteMontree.Stats.Prenom + " est mort(e).");
-                }
+                { CarteMontree.Mourir(); }
             }
-            else
-            {
-                Warning("Vous avez tué " + CarteCiblee.Stats.Prenom + " avec " + CarteMontree.Stats.Prenom);
-                CarteCiblee.Mourir();
-            }
+            else { CarteCiblee.Mourir(); }
         }
         CarteCiblee = null;
         EnTrainCibleCarte = false;
@@ -466,8 +456,7 @@ public class GameManager : MonoBehaviour
                     Cible("PV", 20, false);
                     break;
                 case 4: //Enlever 10 a lui même
-                    //Cible("PV", -10, false);
-                    //Imobilise(1);
+                    StartCoroutine(Immobiliser());
                     break;
                 case 5: //Couper les liens
                     StartCoroutine(CouperLiens());
@@ -475,11 +464,15 @@ public class GameManager : MonoBehaviour
                 case 6:
                     //CreerLien(Cible1, Cible2);
                     break;
-                case 7:
-                    //SeDeplacer(Case Départ, CaseArrivee);
+                case 7: //Téléporter
+                    EnTrainCibleTerrain = true;
+                    FondColore.gameObject.transform.Translate(0, -50, 0f);
+                    ActionEnCoursTexte.text = "Choisissez où vous déplacer".ToString();
+                    EnleverBonBoutons();
+                    StartCoroutine(Teleporter());
                     break;
                 case 8: //Echanger Ne marche pas beaucoup
-                    CommencerPouvoir();
+                    CommencerPouvoir("Echanger à bas cout", true);
                     ActionEnCoursTexte.text = "Choisissez avec qui vous voulez échanger votre carte".ToString();
                     StartCoroutine(AttendreCibleeEchange());
                     break;
@@ -515,69 +508,88 @@ public class GameManager : MonoBehaviour
         ConditionDeVictoire();
     }
 
-    private void Cible(string p, int degat, bool recc)
+    IEnumerator Teleporter()
+    {
+        CommencerPouvoir("Choisissez avec qui va être immobilisé.", false);
+        yield return new WaitUntil(() => TerrainCiblee != null);
+        if (TerrainCiblee.CartePlacee != null)
+        { Warning("Il y a déjà quelqu'un ici !"); }
+        else
+        {
+            CarteMontree.PlaceDeTerrain.CartePlacee = null;
+            CarteMontree.PlaceDeTerrain = TerrainCiblee;
+            TerrainCiblee.CartePlacee = CarteMontree;
+            CarteMontree.GetComponent<RectTransform>().anchoredPosition = TerrainCiblee.GetComponent<RectTransform>().anchoredPosition;
+        }
+        FinirPouvoir(CarteMontree.Stats.Prenom + "s'est téléporté(e)", false);
+    }
+    IEnumerator Immobiliser()
+    {
+        CommencerPouvoir("Choisissez avec qui va être immobilisé.", true);
+        yield return new WaitUntil(() => CarteCiblee != null);
+        CarteCiblee.Retourner();
+        CarteMontree.Stats.PVar = CarteCiblee.Stats.PVar - 10;
+        if (CarteMontree.Stats.PVar <= 0) { CarteMontree.Mourir(); }
+        CarteCiblee.Immobile = 2;
+        FinirPouvoir(CarteCiblee.Stats.Prenom + " ne pourra pas agir au prochain tour.", true);
+    }
+    private void Cible(string p, int degat, bool surSoi)
     {
         DegatCiblee = degat;
-        StartCoroutine(CiblePV());
+        if (p == "PV") { StartCoroutine(CiblePV()); }
     }
     public IEnumerator CiblePV()
     {
-        CommencerPouvoir("Choisissez avec qui va avoir" + DegatCiblee + " PV.");
+        CommencerPouvoir("Choisissez avec qui va avoir" + DegatCiblee + " PV.", true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        Warning(CarteCiblee.Stats.Prenom + " a eu une modification de " + DegatCiblee + " PV.");
         CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar + DegatCiblee;
-        if (CarteCiblee.Stats.PVar <= 0)
-        {
-            CarteCiblee.Mourir();
-            Warning(CarteCiblee.Stats.Prenom + " est mort(e).");
-        }
+        if (CarteCiblee.Stats.PVar <= 0) { CarteCiblee.Mourir(); }
         else if (CarteCiblee.Stats.PVar > CarteCiblee.Stats.PV) { CarteCiblee.Stats.PVar = CarteCiblee.Stats.PV; }
-        FinirPouvoir();
+        FinirPouvoir(CarteCiblee.Stats.Prenom + " a eu une modification de " + DegatCiblee + " PV.", true);
     }
     public IEnumerator ChangerPouvoir()
     {
-        CommencerPouvoir("Choisissez avec qui va perdre son pouvoir.");
+        CommencerPouvoir("Choisissez avec qui va perdre son pouvoir.", true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        Warning(CarteCiblee.Stats.Prenom + " a perdu son pouvoir.");
         CarteCiblee.Retourner();
         CarteCiblee.Stats.PouvoirVar = "Plus de pouvoir.";
         CarteCiblee.Stats.IdPouvoirVar = 0;
         CarteCiblee.Stats.CoutPouvoirVar = 0;
-        FinirPouvoir();
+        FinirPouvoir(CarteCiblee.Stats.Prenom + " a perdu son pouvoir.", true);
     }
     public IEnumerator MourirCiblee()
     {
-        CommencerPouvoir("Choisissez avec qui va mourir avec " + CarteMontree.Stats.Prenom);
+        CommencerPouvoir("Choisissez avec qui va mourir avec " + CarteMontree.Stats.Prenom, true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        Warning(CarteCiblee.Stats.Prenom + " est mort avec " + CarteMontree.Stats.Prenom);
         CarteCiblee.Mourir();
         CarteMontree.Mourir();
-        FinirPouvoir();
+        FinirPouvoir(CarteCiblee.Stats.Prenom + " est mort avec " + CarteMontree.Stats.Prenom, true);
     }
     IEnumerator CouperLiens()
     {
-        CommencerPouvoir("Choisissez qui va perdre tous ses liens par " + CarteMontree.Stats.Prenom);
+        CommencerPouvoir("Choisissez qui va perdre tous ses liens par " + CarteMontree.Stats.Prenom, true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        Warning(CarteCiblee.Stats.Prenom + " a perdu tous ses liens.");
         CarteCiblee.Liens.Clear();
         CarteCiblee.Stats.liens.Clear();
-        FinirPouvoir();
+        FinirPouvoir(CarteCiblee.Stats.Prenom + " a perdu tous ses liens.", true);
     }
-    private void CommencerPouvoir(string texte)
+    private void CommencerPouvoir(string texte, bool carteCiblee)
     {
         FondColore.gameObject.transform.Translate(0, -50, 0f);
-        EnTrainCibleCarte = true;
+        if (carteCiblee == true) { EnTrainCibleCarte = true; }
+        else { EnTrainCibleTerrain = true; ToutTerrain.transform.SetAsLastSibling(); }
         EnleverBonBoutons();
         Warning(texte);
     }
-    private void FinirPouvoir()
+    private void FinirPouvoir(string texte, bool carteCiblee)
     {
         FondColore.gameObject.transform.Translate(0, 50, 0f);
-        CarteCiblee = null;
+        if (carteCiblee == true) { CarteCiblee = null; EnTrainCibleCarte = false; }
+        else { TerrainCiblee = null; EnTrainCibleTerrain = false; ToutTerrain.transform.SetAsFirstSibling(); }
         CarteMontree.AUtilisePouvoir = true;
-        EnTrainCibleCarte = false;
-        CacherGrandeCarte();
         if (CarteMontree.Stats.IdPouvoir != 8) { PMEnCours = PMEnCours - CarteMontree.Stats.CoutPouvoirVar; }
+        Warning(texte);
+        CacherGrandeCarte();
         AfficherPM();
     }
 

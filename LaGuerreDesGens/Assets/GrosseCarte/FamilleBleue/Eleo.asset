@@ -19,8 +19,8 @@ MonoBehaviour:
   PV: 20
   PVar: 20
   PA: 20
-  IdPouvoir: 10
-  IdPouvoirVar: 10
+  IdPouvoir: 4
+  IdPouvoirVar: 4
   Pouvoir: "Imobilise une carte et lui enl\xE8ve 10 PV."
   PouvoirVar: "Imobilise une carte et lui enl\xE8ve 10 PV."
   CoutPouvoir: 1
