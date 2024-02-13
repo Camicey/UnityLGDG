@@ -307,6 +307,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a76e1111b5510da44b2196fa9200e012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BoutonNext: {fileID: 0}
+  familles: []
 --- !u!1 &926974011
 GameObject:
   m_ObjectHideFlags: 0
@@ -696,7 +698,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 715884123}
         m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
-        m_MethodName: Jouer
+        m_MethodName: Familles
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

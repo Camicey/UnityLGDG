@@ -16,15 +16,20 @@ MonoBehaviour:
   Prenom: Stones
   Image: {fileID: 21300000, guid: 00ea80f630ac0df45a964373362dc231, type: 3}
   PM: 3
-  PV: 20
-  PVar: 20
+  PV: 2
+  PVar: 0
   PA: 30
   IdPouvoir: 12
+  IdPouvoirVar: 12
   Pouvoir: "Retourne toutes les cartes pi\xE8ges."
+  PouvoirVar: "Retourne toutes les cartes pi\xE8ges."
   CoutPouvoir: 1
+  CoutPouvoirVar: 1
   Famille: Bleue
   FamilleImage: {fileID: 21300000, guid: 9d8a533f149825449b17d38b2b8de220, type: 3}
   Type: Robot
   TypeImage: {fileID: 21300000, guid: b96f4e474b0260d4190304b49c9e4f53, type: 3}
   liens:
+  - {fileID: 11400000, guid: 3472bc042c7d5544da5a05dc035dcec5, type: 2}
+  liensvar:
   - {fileID: 11400000, guid: 3472bc042c7d5544da5a05dc035dcec5, type: 2}

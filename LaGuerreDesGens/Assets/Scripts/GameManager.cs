@@ -36,14 +36,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        //Demander les infos des joueurs
-        //Demander quelles familles ils veulent jouer
-        //NouvellePartie(); //Normalement on aura des choix donc il changera de place
-        //OnGUI();
-        FamillesChoisies.Add("Rose");
-        FamillesChoisies.Add("Bleue");
-        PMEnCoursTexte.text = "0".ToString();
-        Warning("Bienvenue sur le jeu !");
+        Pioche.Clear();
     }
     void OnGUI()
     {
@@ -230,8 +223,16 @@ public class GameManager : MonoBehaviour
             PMEnCours--;
             CarteCiblee.Retourner();
             CarteMontree.Retourner();
-            CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar - CarteMontree.Stats.PA;
-            Warning(CarteMontree.Stats.Prenom + " a infligé " + CarteMontree.Stats.PA.ToString() + " a " + CarteCiblee.Stats.Prenom);
+            if (CarteCiblee.Stats.Type == "Robot")
+            {
+                CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar - 1;
+                Warning(CarteMontree.Stats.Prenom + " a infligé 1 coup à " + CarteCiblee.Stats.Prenom);
+            }
+            else
+            {
+                CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar - CarteMontree.Stats.PA;
+                Warning(CarteMontree.Stats.Prenom + " a infligé " + CarteMontree.Stats.PA.ToString() + " à " + CarteCiblee.Stats.Prenom);
+            }
             if (CarteCiblee.Stats.PVar > 0)
             {
                 CarteMontree.Stats.PVar = CarteMontree.Stats.PVar - CarteCiblee.Stats.PA;
@@ -542,10 +543,18 @@ public class GameManager : MonoBehaviour
     {
         CommencerPouvoir("Choisissez avec qui va avoir" + DegatCiblee + " PV.", true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar + DegatCiblee;
-        if (CarteCiblee.Stats.PVar <= 0) { CarteCiblee.Mourir(); }
-        else if (CarteCiblee.Stats.PVar > CarteCiblee.Stats.PV) { CarteCiblee.Stats.PVar = CarteCiblee.Stats.PV; }
-        FinirPouvoir(CarteCiblee.Stats.Prenom + " a eu une modification de " + DegatCiblee + " PV.", true);
+        if (CarteCiblee.Stats.Type == "Robot")
+        {
+            FinirPouvoir("Il n'est pas possible de soigner les robots...", true);
+            PMEnCours = PMEnCours + CarteMontree.Stats.CoutPouvoirVar;
+        }
+        else
+        {
+            CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar + DegatCiblee;
+            if (CarteCiblee.Stats.PVar <= 0) { CarteCiblee.Mourir(); }
+            else if (CarteCiblee.Stats.PVar > CarteCiblee.Stats.PV) { CarteCiblee.Stats.PVar = CarteCiblee.Stats.PV; }
+            FinirPouvoir(CarteCiblee.Stats.Prenom + " a eu une modification de " + DegatCiblee + " PV.", true);
+        }
     }
     public IEnumerator ChangerPouvoir()
     {
