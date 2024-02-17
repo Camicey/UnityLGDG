@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -31,17 +32,11 @@ public class GameManager : MonoBehaviour
     public List<Carte> Defausse = new List<Carte>();
     public List<Carte> ToutesLesCartes = new List<Carte>();
     public List<string> FamillesChoisies = new List<string>();
-    public string stringToEdit = "Hello \nI've got 2 lines...";
     public GameObject FondColore;
 
     void Start()
     {
         Pioche.Clear();
-    }
-    void OnGUI()
-    {
-        //stringToEdit = GUI.TextArea(new Rect(500, 200, 1000, 200), stringToEdit, 200);
-        //stringToEdit.FontSize = "52";
     }
     public void NouvellePartie() // On récupèrera les joueurs et familles
     {
@@ -92,6 +87,7 @@ public class GameManager : MonoBehaviour
         }
         ChangerDeTour();
     }
+
     public void Piocher()
     {
         if (Pioche.Count >= 1 && JoueurActif.APioche == false)
@@ -129,7 +125,7 @@ public class GameManager : MonoBehaviour
     }
     public void ChangerDeTour()
     {
-
+        if (ConditionDeVictoire() == true) { SceneManager.LoadScene("Menu"); }
         Warning("On change de tour : " + Tour.ToString() + ". C'est au tour de : " + JoueurPassif.Prenom);
         JoueurActif.APioche = false;
         Tour++;
@@ -160,7 +156,7 @@ public class GameManager : MonoBehaviour
         EnleverBonBoutons();
         if (Tour == 1 || Tour == 2) { PMEnCours = 3; StartCoroutine(ChoixDeStratege()); }
         else if (Tour > 2 && JoueurActif.TrouverStratege() != null) { PMEnCours = JoueurActif.TrouverStratege().Stats.PM; } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
-        else if (Tour > 2 && JoueurActif.TrouverStratege() == null) { PMEnCours = 2; Piocher(); StartCoroutine(ChoixDeStratege()); }
+        else if (Tour > 2 && JoueurActif.TrouverStratege() == null) { PMEnCours = 3; Piocher(); StartCoroutine(ChoixDeStratege()); }
         AfficherPM();
     }
     IEnumerator ChoixDeStratege() //Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
@@ -305,7 +301,7 @@ public class GameManager : MonoBehaviour
                     PMEnCours--;
                     CacherGrandeCarte();
                     AfficherPM();
-                    if (JoueurActif.TrouverStratege() == null) { PMEnCours = 1; StartCoroutine(ChoixDeStratege()); }
+                    if (JoueurActif.TrouverStratege() == null) { PMEnCours = 2; StartCoroutine(ChoixDeStratege()); }
                     return;
                 }
                 else { Warning("Pas de place dans le deck."); }
@@ -431,12 +427,13 @@ public class GameManager : MonoBehaviour
         CarteMontree.EstMontreeSurCarte = false;
         CarteMontree = null;
     }
-    public void ConditionDeVictoire()
+    public bool ConditionDeVictoire()
     {
         if (Pioche.Count == 0 && JoueurActif.CartesPossedees.Count == 0)
-        { Warning("Le jeu est terminé. " + JoueurPassif.Prenom + " gagne avec " + JoueurPassif.CartesPossedees.Count + " carte(s) restantes."); }
+        { Warning("Le jeu est terminé. " + JoueurPassif.Prenom + " gagne avec " + JoueurPassif.CartesPossedees.Count + " carte(s) restantes."); return true; }
         else if (Pioche.Count == 0 && JoueurPassif.CartesPossedees.Count == 0)
-        { Warning("Le jeu est terminé. " + JoueurActif.Prenom + " gagne avec " + JoueurActif.CartesPossedees.Count + " carte(s) restantes."); }
+        { Warning("Le jeu est terminé. " + JoueurActif.Prenom + " gagne avec " + JoueurActif.CartesPossedees.Count + " carte(s) restantes."); return true; }
+        return false;
     }
 
     public void Pouvoir()

@@ -10185,6 +10185,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2023406140}
     - target: {fileID: 6447972256912264769, guid: 23b6c03d4278269468e2bd51845146d8, type: 3}
+      propertyPath: FinirLeTour
+      value: 
+      objectReference: {fileID: 654410808}
+    - target: {fileID: 6447972256912264769, guid: 23b6c03d4278269468e2bd51845146d8, type: 3}
       propertyPath: ToutTerrain
       value: 
       objectReference: {fileID: 1389770599}
@@ -10208,6 +10212,10 @@ PrefabInstance:
       propertyPath: PMEnCoursTexte
       value: 
       objectReference: {fileID: 485909495}
+    - target: {fileID: 6447972256912264769, guid: 23b6c03d4278269468e2bd51845146d8, type: 3}
+      propertyPath: BoutonFinirTour
+      value: 
+      objectReference: {fileID: 654410808}
     - target: {fileID: 6447972256912264769, guid: 23b6c03d4278269468e2bd51845146d8, type: 3}
       propertyPath: ActionEnCoursTexte
       value: 

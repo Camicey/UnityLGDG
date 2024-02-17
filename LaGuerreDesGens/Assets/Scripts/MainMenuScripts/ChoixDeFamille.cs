@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ChoixDeFamille : MonoBehaviour
 {
@@ -12,23 +13,26 @@ public class ChoixDeFamille : MonoBehaviour
     void Start()
     {
         EstActive = false;
-
     }
 
     public void Selectionner()
     {
+        var colors = GetComponent<Image>().color;
+
         if (EstActive == false)
         {
             EstActive = true;
             Menu.JeuEnCours.FamillesChoisies.Add(Famille);
-            //GetComponent<Image>().color = Color.blue;
+            colors = Color.grey;
+
         }
         else
         {
             EstActive = false;
             Menu.JeuEnCours.FamillesChoisies.Remove(Famille);
-            //GetComponent<Image>().color = Color.white;
+            colors = Color.white;
         }
+        GetComponent<Image>().color = colors;
         Menu.MAJ();
     }
 
