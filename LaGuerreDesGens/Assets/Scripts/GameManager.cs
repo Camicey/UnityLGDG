@@ -437,7 +437,7 @@ public class GameManager : MonoBehaviour
     }
     public void Pouvoir()
     {
-        if (CarteMontree.AUtilisePouvoir == false)
+        if (CarteMontree.AUtilisePouvoir == true)
         {
             Warning("Ce personnage à déjà utilisé son pouvoir.");
         }
@@ -516,7 +516,7 @@ public class GameManager : MonoBehaviour
         Carte carteAttente = CarteCiblee;
         CarteCiblee.Retourner();
         CarteCiblee = null;
-        Warning("Choississez avec qui " + carteAttente.Stats.Prenom + "va avoir un lien.");
+        Warning("Choississez avec qui " + carteAttente.Stats.Prenom + " va avoir un lien.");
         yield return new WaitUntil(() => CarteCiblee != null);
         CarteCiblee.Retourner();
         if (CarteCiblee.Id == carteAttente.Id)
