@@ -20,12 +20,18 @@ MonoBehaviour:
   PVar: 10
   PA: 35
   IdPouvoir: 11
-  Pouvoir: Toutes les cartes d'une famille se retournent.
+  IdPouvoirVar: 11
+  Pouvoir: Toutes les cartes de sa famille se retournent.
+  PouvoirVar: Toutes les cartes de sa famille se retournent.
   CoutPouvoir: 2
+  CoutPouvoirVar: 2
   Famille: Rose
   FamilleImage: {fileID: 21300000, guid: be93a18f5969f134f8c34efa8554bec9, type: 3}
   Type: Attaquant
   TypeImage: {fileID: 21300000, guid: 8434d0ed4852eb34bbc3937f13dda6e2, type: 3}
   liens:
+  - {fileID: 11400000, guid: d7f2a8934d1e40848a7537a0727db3dd, type: 2}
+  - {fileID: 11400000, guid: db40935cd1097f94c8fd1ed7a61e0dda, type: 2}
+  liensvar:
   - {fileID: 11400000, guid: d7f2a8934d1e40848a7537a0727db3dd, type: 2}
   - {fileID: 11400000, guid: db40935cd1097f94c8fd1ed7a61e0dda, type: 2}

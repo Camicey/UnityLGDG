@@ -20,11 +20,17 @@ MonoBehaviour:
   PVar: 30
   PA: 10
   IdPouvoir: 10
+  IdPouvoirVar: 10
   Pouvoir: Toutes les cartes du plateau se retournent.
+  PouvoirVar: Toutes les cartes du plateau se retournent.
   CoutPouvoir: 3
+  CoutPouvoirVar: 3
   Famille: Bleue
   FamilleImage: {fileID: 21300000, guid: 9d8a533f149825449b17d38b2b8de220, type: 3}
   Type: Neutre
   TypeImage: {fileID: 21300000, guid: e3315a9042f95e04981640b352388178, type: 3}
   liens:
   - {fileID: 11400000, guid: 8a985542acafcab47b22c7479a75ce78, type: 2}
+  liensvar:
+  - {fileID: 11400000, guid: 8a985542acafcab47b22c7479a75ce78, type: 2}
+  - {fileID: 11400000, guid: eb32b44e8b9301144836458920698260, type: 2}

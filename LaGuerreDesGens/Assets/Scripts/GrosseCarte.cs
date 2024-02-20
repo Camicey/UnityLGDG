@@ -41,7 +41,7 @@ public class GrosseCarte : MonoBehaviour
     public string MontrerLiens()
     {
         string description = " ";
-        foreach (CarteSettings lien in Carte.liens)
+        foreach (CarteSettings lien in Carte.liensvar)
         {
             description += lien.Prenom + "\n";
         }
@@ -69,9 +69,5 @@ public class GrosseCarte : MonoBehaviour
     {
         Montrer();
     }
-
-
-
-
 }
 

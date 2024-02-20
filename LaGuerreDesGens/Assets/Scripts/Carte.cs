@@ -44,7 +44,11 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         Stats.PouvoirVar = Stats.Pouvoir;
         Stats.IdPouvoirVar = Stats.IdPouvoir;
         Stats.CoutPouvoirVar = Stats.CoutPouvoir;
-        Stats.liensvar = Stats.liens;
+        Stats.liensvar.Clear();
+        foreach (CarteSettings lien in Stats.liens)
+        {
+            Stats.liensvar.Add(lien);
+        }
         PlaceDeDeck = null;
         PlaceDeTerrain = null;
         Appartenance = null;
@@ -95,13 +99,23 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
 
     public void Mourir()
     {
+        if (Stats.IdPouvoir == 13 && JeuEnCours.Pioche.Count != 0)
+        {
+            EstEnJeu = false;
+            JeuEnCours.Warning(Stats.Prenom + " est retourné dans la pioche.");
+            JeuEnCours.Pioche.Add(this);
+        }
+        else
+        {
+            EstEnJeu = true;
+            JeuEnCours.Warning(Stats.Prenom + " est mort(e).");
+        }
         Appartenance.CartesPossedees.Remove(this);
         Appartenance = null;
-        EstEnJeu = true;
         this.gameObject.transform.Translate(0, 1500, 0f);
         PlaceDeTerrain.CartePlacee = null;
         PlaceDeTerrain = null;
-        JeuEnCours.Warning(Stats.Prenom + " est mort(e).");
+
     }
 
     public void Retourner()
