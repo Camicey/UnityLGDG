@@ -231,8 +231,16 @@ public class GameManager : MonoBehaviour
             }
             if (CarteCiblee.Stats.PVar > 0)
             {
-                CarteMontree.Stats.PVar = CarteMontree.Stats.PVar - CarteCiblee.Stats.PA;
-                Warning(CarteCiblee.Stats.Prenom + " est vivant(e) et a infligé " + CarteCiblee.Stats.PA.ToString() + " en retour.");
+                if (CarteMontree.Stats.Type == "Robot")
+                {
+                    CarteMontree.Stats.PVar = CarteMontree.Stats.PVar - 1;
+                    Warning(CarteCiblee.Stats.Prenom + " a infligé 1 coup à " + CarteMontree.Stats.Prenom);
+                }
+                else
+                {
+                    CarteMontree.Stats.PVar = CarteMontree.Stats.PVar - CarteCiblee.Stats.PA;
+                    Warning(CarteCiblee.Stats.Prenom + " est vivant(e) a " + CarteCiblee.Stats.PVar + " PV et a infligé " + CarteCiblee.Stats.PA.ToString() + " en retour.");
+                }
                 if (CarteMontree.Stats.PVar <= 0)
                 { CarteMontree.Mourir(); }
             }
@@ -606,7 +614,7 @@ public class GameManager : MonoBehaviour
         CommencerPouvoir("Choisissez qui va perdre tous ses liens par " + CarteMontree.Stats.Prenom, true);
         yield return new WaitUntil(() => CarteCiblee != null);
         CarteCiblee.Liens.Clear();
-        CarteCiblee.Stats.liens.Clear();
+        CarteCiblee.Stats.liensvar.Clear();
         FinirPouvoir(CarteCiblee.Stats.Prenom + " a perdu tous ses liens.", true, true);
     }
     private void CommencerPouvoir(string texte, bool carteCiblee)
