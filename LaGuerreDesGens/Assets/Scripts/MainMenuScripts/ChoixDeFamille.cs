@@ -7,8 +7,8 @@ public class ChoixDeFamille : MonoBehaviour
 {
     public bool EstActive = false;
     public string Famille;
-
     public MainMenu Menu;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,7 +24,6 @@ public class ChoixDeFamille : MonoBehaviour
             EstActive = true;
             Menu.JeuEnCours.FamillesChoisies.Add(Famille);
             colors = Color.grey;
-
         }
         else
         {
@@ -36,4 +35,23 @@ public class ChoixDeFamille : MonoBehaviour
         Menu.MAJ();
     }
 
+    public void SelectionnerTypePartie()
+    {
+        var colors = GetComponent<Image>().color;
+
+        if (EstActive == false && Menu.TypePartie == "")
+        {
+            EstActive = true;
+            Menu.TypePartie = Famille;
+            colors = Color.grey;
+        }
+        else if (EstActive == true && Menu.TypePartie == Famille)
+        {
+            EstActive = false;
+            Menu.TypePartie = "";
+            colors = Color.white;
+        }
+        GetComponent<Image>().color = colors;
+        Menu.MAJ();
+    }
 }

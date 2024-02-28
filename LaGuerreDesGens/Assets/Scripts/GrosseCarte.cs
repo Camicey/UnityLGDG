@@ -57,17 +57,13 @@ public class GrosseCarte : MonoBehaviour
         {
             Carte = carteMontree;
             Montrer();
-            Debug.Log(Carte.Prenom);
-            gameObject.transform.Translate(940, 0, 0f); // -618
+            GetComponent<RectTransform>().anchoredPosition = new Vector2(-660, 0);
         }
         else
         {
-            gameObject.transform.Translate(-940, 0, 0f);
+            GetComponent<RectTransform>().anchoredPosition = new Vector2(-1600, 0);
         }
     }
-    public void Start()
-    {
-        Montrer();
-    }
+
 }
 

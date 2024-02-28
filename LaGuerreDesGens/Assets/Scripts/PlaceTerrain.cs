@@ -11,9 +11,8 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
 
     public void Start()
     { CartePlacee = null; }
-    public void OnDrop(PointerEventData eventData)
+    public void OnDrop(PointerEventData eventData) //Quand une carte est lâchée sur le terrain
     {
-        Debug.Log("OnDrop");
         if (eventData.pointerDrag != null &&
         Appartenance == JeuEnCours.JoueurActif &&
         eventData.pointerDrag.GetComponent<Carte>().EstEnJeu == false &&
@@ -31,8 +30,7 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
         }
         else
         {
-            Debug.Log("Oh oh problem for you");
-            Debug.Log(eventData.pointerDrag + (Appartenance == JeuEnCours.JoueurActif).ToString() + 
+            Debug.Log(eventData.pointerDrag + (Appartenance == JeuEnCours.JoueurActif).ToString() +
             eventData.pointerDrag.GetComponent<Carte>().EstEnJeu +
             (eventData.pointerDrag.GetComponent<Carte>().Appartenance == JeuEnCours.JoueurActif).ToString() + (JeuEnCours.PMEnCours >= 1).ToString());
         }
