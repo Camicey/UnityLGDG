@@ -16,10 +16,10 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public bool EstCachee = false; //Est cachée à l'adversaire
     public bool EstEnJeu = false; //Est sur le plateau
     public bool Stratege = false; //Est un stratège
-    public bool AUtilisePouvoir = false; //Il ne peut pas utilisé son pouvoir qu'une fois par tour
-    public int Immobile = 0;
+    public bool AUtilisePouvoir = false; //La carte ne peut utiliser son pouvoir qu'une fois par tour
+    public int Immobile = 0; //Si ce nombre est plus grand que 0, la carte ne peut pas agir
 
-    public Joueur Appartenance;
+    public Joueur Appartenance; //Joueur auquel appartient la carte
     public Vector2 PositionBase;
     public GameManager JeuEnCours;
     public PlaceDeck PlaceDeDeck;
@@ -33,7 +33,6 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         PositionBase = rectTransform.anchoredPosition;
-        Stats.PVar = Stats.PV;
         JeuEnCours.ToutesLesCartes.Add(this);
     }
 
@@ -45,9 +44,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         Stats.CoutPouvoirVar = Stats.CoutPouvoir;
         Stats.liensvar.Clear();
         foreach (CarteSettings lien in Stats.liens)
-        {
-            Stats.liensvar.Add(lien);
-        }
+        { Stats.liensvar.Add(lien); }
         PlaceDeDeck = null;
         PlaceDeTerrain = null;
         Appartenance = null;
@@ -58,20 +55,19 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         AUtilisePouvoir = false;
         GetComponent<RectTransform>().anchoredPosition = new Vector2(-1200, 0);
         if (Stats.Famille == JeuEnCours.FamillesChoisies[0] || Stats.Famille == JeuEnCours.FamillesChoisies[1])
-        { JeuEnCours.Pioche.Add(this); }
+        { JeuEnCours.Pioche.Add(this); } //Mettre les cartes des familles choisies dans la pioche
     }
 
-    public void Agrandir() // Agrandir la carte.
+    public void Agrandir() // Agrandir la carte. 
     {
         if (EstEnJeu == false)
         {
             rectTransform.sizeDelta = new Vector2(336, 504);
             this.gameObject.transform.Translate(90, 180, 1.5f);
-            rectTransform.SetAsLastSibling(); // Met la carte devant les autres ouiiiii
+            rectTransform.SetAsLastSibling(); // Met la carte devant les autres
         }
     }
-
-    public void Retrecir()
+    public void Retrecir() //Rétrécir la carte. 
     {
         if (EstEnJeu == false)
         {
@@ -88,7 +84,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
             else if (Stratege == true && JeuEnCours.StrategeSeul()) { JeuEnCours.MontrerBoutonsChoix("StrategeSeul"); }
             else { JeuEnCours.MontrerBoutonsChoix("Allie"); }
         }
-        else
+        else // Cette partie n'est pas utile mais le sera plus tard
         {
             if (Stratege == true) { JeuEnCours.MontrerBoutonsChoix("StrategeEnnemi"); }
             else { JeuEnCours.MontrerBoutonsChoix("Ennemi"); }
@@ -103,17 +99,12 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
             JeuEnCours.Warning(Stats.Prenom + " est retourné dans la pioche.");
             JeuEnCours.Pioche.Add(this);
         }
-        else
-        {
-            EstEnJeu = true;
-            JeuEnCours.Warning(Stats.Prenom + " est mort(e).");
-        }
-        Appartenance.CartesPossedees.Remove(this);
+        else { JeuEnCours.Warning(Stats.Prenom + " est mort(e)."); }
+        Appartenance.CartesPossedees.Remove(this); // On enlève la carte du joueur a qui il apparatient
         Appartenance = null;
-        this.gameObject.transform.Translate(0, 1500, 0f);
+        gameObject.transform.Translate(0, 1500, 0f);
         PlaceDeTerrain.CartePlacee = null;
         PlaceDeTerrain = null;
-
     }
 
     public void Retourner()

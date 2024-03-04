@@ -12,16 +12,17 @@ public class Joueur : MonoBehaviour
     public List<PlaceTerrain> Terrain = new List<PlaceTerrain>();
     public bool APioche;
 
+    public void Start()
+    {
+        CartesPossedees.Clear();
+        APioche = false;
+    }
     public Carte TrouverStratege()
     {
         foreach (Carte carte in CartesPossedees)
         { if (carte.Stratege == true) { return carte; } }
         return null;
     }
-    public void Start()
-    {
-        CartesPossedees.Clear();
-        APioche = false;
-    }
+
 }
 

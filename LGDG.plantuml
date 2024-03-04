@@ -13,69 +13,175 @@ class Joueur {
     Id : int
     Prenom : string
     Email : string
-    List <> Deck : List<Carte>
-    TerrainJoueur : Terrain
+    List <> Deck : List<PlaceDeck>
+    List <> Terrain : List<PlaceTerrain>
+    List <> CartesPossedees : List<Carte>
     Connecte : bool
+
+    Start()
+    TrouverStratege()
 }
 
-class Terrain {
+class PlaceTerrain {
     Id : int
+    CartePlacee : Carte
+    JeuEnCours : GameManager
+    Appartenance : Joueur
     ImageTerre : sprite
+
+    Start()
+    Initialiser()
+    OnDrop()
+    OnPointerDown()
 }
 
+class PlaceDeck {
+    Appartenance : Joueur
+    JeuEnCours : GameManager
+    availableCarteSlots : bool
+    CartePlacee : Carte
+    rectTransform : RectTransform
+}
 
-class Jeu {
-    Id : int
-    ImageTerre : sprite
+class GameManager {
     Joueur1 : Joueur
     Joueur2 : Joueur
+    JoueurActif : Joueur
+    JoueurPassif : Joueur
+    List<> FamillesChoisies : List<string>
+    List<> ToutesLesCartes : List<Carte>
     List<> Pioche : List<Carte>
     List<> Defausse : List<Carte>
+    List<> CartesMontrables : List<Settings>
+    List<> BoutonsDeJeu : List<BoutonChoix>
+    grosseCarte : GrosseCarte
+    CarteMontree : Carte
+    CarteCiblee : Carte
+    DegatCiblee : int
+    TerrainCiblee : PlaceTerrain
+    ToutTerrain : GameObject 
+    FondColore : GameObject 
+    Selection : Image 
+    ImageDosCarte : Sprite 
+    Tour : int
+    PMEnCours : float 
+    PMEnCoursTexte : Text
+    WarningTexte : Text
+    ActionEnCoursTexte : Text
+    TypePartie : string
+    EnTrainCibleCarte : bool
+    EnTrainCibleTerrain : bool
 
-    ChangerDeJoueur()
-    ChoisirFamille()
-    ChoixStratege()
+    Start()
+    NouvellePartie()
+    Piocher()
+    ChangerDeTour()
+    ChoixDeStratege()
+    StrategeSeul()
+    Warning (string texteDonne) 
+    AfficherPM()
+    Attaquer()
+    AttendreCiblee()
+    SeDeplacer()
+    AttendreTerrainCiblee()
+    Retirer()
+    Echanger()
+    AttendreCibleeEchange()
+    VerifierTerrainACote(int terrain)
+    MontrerBoutonsChoix(string situation)
+    EnleverBonBoutons()
+    EchangeDeTerrain(Joueur J1)
+    CacherGrandeCarte()
+    MontrerGrandeCarte(Carte carteMontree)
     ConditionDeVictoire()
-    DebutDeJeu()
     InitialiserCartes() 
+    Pouvoir()
+    CreerLien()
+    Teleporter()
+    Immobiliser()
+    Cible(string p, int degat, bool surSoi )
+    CiblePV()
+    ChangerPouvoir()
+    MourirCiblee()
+    CouperLiens()
+    CommencerPouvoir(string texte, bool carteCiblee)
+    FinirPouvoir(string texte, bool carteCiblee, bool enleverPM )
 }
 
-
-class Carte {
+class CarteSettings {
     Id : int
     Prenom : string
-    Appartenance : Joueur
+    Image : sprite
     PM : int
     PV : int
     PA : int
-    Type : string
-    Famille : string
     IdPouvoir : int
+    Pouvoir : string
     CoutPouvoir : int
-    List <> Liens : List<Carte>
-    Image : sprite
-    EstCachee : bool
-    EstEnJeu : bool
+    
+    PVar : int
+    IdPouvoirVar : int
+    PouvoirVar : string
+    CoutPouvoirVar : int
+    
+    Famille : string
+    FamilleImage : sprite
+    Type : string
+    TypeImage : sprite
 
-    ActiverPouvoir(IdPouvoir, CoutPouvoir)
-    Attaquer(CarteVisee)
-    Echanger(CarteEchange)
+    List <> liens : List<Carte>
+    List <> liensVar : List<Carte>
+}
+
+class Carte {
+    canvas : Canvas 
+    canvasGroup : CanvasGroup 
+    rectTransform : RectTransform
+
+    Id : int 
+    Stats : CarteSettings
+    List<> Liens = new List<Carte>()
+    EstCachee : bool 
+    EstEnJeu : bool 
+    Stratege : bool 
+    AUtilisePouvoir : bool 
+    Immobile : int
+
+    Appartenance : Joueur  
+    PositionBase : Vector2
+    JeuEnCours : GameManager
+    PlaceDeDeck : PlaceDeck
+    PlaceDeTerrain : PlaceTerrain
+    ImageOriginale : Sprite
+
+    Start()
+    Initialiser()
+    Agrandir()
+    Retrecir()
+    MettreBonBoutons()
     Mourir()
-    Poser(Case)
-    Retirer()
     Retourner()
-    SeDeplacer(CaseDepart, CaseArrivee)
+    OnBeginDrag()
+    OnDrag()
+    OnEndDrag()
+    OnPointerDown()
+    OnDrop()
 
-    ChangerPouvoir(NumPouvoir : int, Cible : Carte)
-    ChoisirCible()
-    ChoisirFamille()
-    Cible(PointDe : string, Nombre : int, Recc : bool)
-    Imobilise(NbTour : int)
-    CouperLien(Cible : Carte)
-    CreerLien(Cible1 : Carte, Cible2 : Carte)
-    Mourir(Cible)
-    Retourner(TypeDe : string)
-    RevenirPioche()
+}
+
+class GrosseCarte {
+
+}
+
+class ChoixDeFamille {
+    
+}
+
+class MainMenu {
+
+}
+class BoutonChoix {
+
 }
 
 @enduml

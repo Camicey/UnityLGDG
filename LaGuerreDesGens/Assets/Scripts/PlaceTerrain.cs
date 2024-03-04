@@ -9,13 +9,11 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
     public GameManager JeuEnCours;
     public Joueur Appartenance;
 
-    public void Start()
-    {
-        CartePlacee = null;
-    }
+    public void Start() { CartePlacee = null; }
 
     public void Initialiser()
     {
+        CartePlacee = null;
         if (JeuEnCours.TypePartie == "Longue")
         { GetComponent<RectTransform>().sizeDelta = new Vector2(168, 258); }
     }
