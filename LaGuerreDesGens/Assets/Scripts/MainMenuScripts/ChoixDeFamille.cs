@@ -39,16 +39,16 @@ public class ChoixDeFamille : MonoBehaviour
     {
         var colors = GetComponent<Image>().color;
 
-        if (EstActive == false && Menu.TypePartie == "")
+        if (EstActive == false && Menu.JeuEnCours.TypePartie == "")
         {
             EstActive = true;
-            Menu.TypePartie = Famille;
+            Menu.JeuEnCours.TypePartie = Famille;
             colors = Color.grey;
         }
-        else if (EstActive == true && Menu.TypePartie == Famille)
+        else if (EstActive == true && Menu.JeuEnCours.TypePartie == Famille)
         {
             EstActive = false;
-            Menu.TypePartie = "";
+            Menu.JeuEnCours.TypePartie = "";
             colors = Color.white;
         }
         GetComponent<Image>().color = colors;

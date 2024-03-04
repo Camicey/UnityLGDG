@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     public float PMEnCours; public Text WarningTexte;
     public Text ActionEnCoursTexte;
     public Text PMEnCoursTexte;
+    public string TypePartie = "";
     public bool EnTrainCibleCarte = false;
     public bool EnTrainCibleTerrain = false;
 
@@ -65,8 +66,8 @@ public class GameManager : MonoBehaviour
             slot.gameObject.SetActive(false);
             slot.Start();
         }
-        foreach (PlaceTerrain slot in JoueurActif.Terrain) { slot.Start(); }
-        foreach (PlaceTerrain slot in JoueurPassif.Terrain) { slot.Start(); }
+        foreach (PlaceTerrain slot in JoueurActif.Terrain) { slot.Start(); slot.Initialiser(); }
+        foreach (PlaceTerrain slot in JoueurPassif.Terrain) { slot.Start(); slot.Initialiser(); }
         foreach (Carte carte in ToutesLesCartes) // Mettre les cartes dans la pioche
         { carte.Initialiser(); }
         if (CarteMontree != null) { CacherGrandeCarte(); }
@@ -298,6 +299,7 @@ public class GameManager : MonoBehaviour
                     CarteMontree.EstCachee = false;
                     CarteMontree.EstEnJeu = false;
                     CarteMontree.Stratege = false;
+                    CarteMontree.rectTransform.sizeDelta = new Vector2(240, 360);
                     PMEnCours--;
                     CacherGrandeCarte();
                     AfficherPM();
@@ -436,7 +438,9 @@ public class GameManager : MonoBehaviour
         CarteMontree = carteMontree;
         grosseCarte.SeDecaler(CarteMontree.Stats, true);
         if (Tour > 2 && CarteMontree.Immobile == 0) { CarteMontree.MettreBonBoutons(); }
-        Selection.rectTransform.anchoredPosition = CarteMontree.rectTransform.anchoredPosition;
+        if (TypePartie == "Longue") { Selection.rectTransform.sizeDelta = new Vector2(200, 290); } //Changer la taille en fonction de la partie
+        else { Selection.rectTransform.sizeDelta = new Vector2(265, 385); }
+        Selection.rectTransform.anchoredPosition = CarteMontree.rectTransform.anchoredPosition; //Changer sa position
         if (CarteMontree.Appartenance != JoueurActif) { Selection.color = Color.red; }
         else { Selection.color = Color.blue; }
     }

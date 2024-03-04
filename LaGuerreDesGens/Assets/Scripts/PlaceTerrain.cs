@@ -10,7 +10,16 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
     public Joueur Appartenance;
 
     public void Start()
-    { CartePlacee = null; }
+    {
+        CartePlacee = null;
+    }
+
+    public void Initialiser()
+    {
+        if (JeuEnCours.TypePartie == "Longue")
+        { GetComponent<RectTransform>().sizeDelta = new Vector2(168, 258); }
+    }
+
     public void OnDrop(PointerEventData eventData) //Quand une carte est lâchée sur le terrain
     {
         if (eventData.pointerDrag != null &&
@@ -25,6 +34,7 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
             eventData.pointerDrag.GetComponent<Carte>().PlaceDeTerrain = this;
             if (JeuEnCours.JoueurActif.Terrain[0] != null && this == JeuEnCours.JoueurActif.Terrain[0]) { CartePlacee.EstCachee = false; }
             else { CartePlacee.EstCachee = true; }
+            CartePlacee.rectTransform.sizeDelta = GetComponent<RectTransform>().sizeDelta; //La carte se met à la taille de la case
             JeuEnCours.PMEnCours -= 1;
             JeuEnCours.AfficherPM();
         }

@@ -65,7 +65,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     {
         if (EstEnJeu == false)
         {
-            rectTransform.sizeDelta = new Vector2(780, 1170);
+            rectTransform.sizeDelta = new Vector2(336, 504);
             this.gameObject.transform.Translate(90, 180, 1.5f);
             rectTransform.SetAsLastSibling(); // Met la carte devant les autres ouiiiii
         }
@@ -75,7 +75,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     {
         if (EstEnJeu == false)
         {
-            rectTransform.sizeDelta = new Vector2(600, 900);
+            rectTransform.sizeDelta = new Vector2(240, 360);
             this.gameObject.transform.Translate(-90, -180, 0f);
         }
     }

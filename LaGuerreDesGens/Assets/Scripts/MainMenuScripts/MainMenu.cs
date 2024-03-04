@@ -13,7 +13,6 @@ public class MainMenu : MonoBehaviour
     public List<PlaceTerrain> ToutTerrain = new List<PlaceTerrain>();
     public GameObject ImageGrandePartie;
     public static bool JeuEnPause = false;
-    public string TypePartie = "";
 
 
     // Start is called before the first frame update
@@ -35,7 +34,7 @@ public class MainMenu : MonoBehaviour
 
     public void Jouer()
     {
-        if (TypePartie == "Longue") { InitialiserLonguePartie(); }
+        if (JeuEnCours.TypePartie == "Longue") { InitialiserLonguePartie(); }
         JeuEnCours.NouvellePartie();
         Ecran.SetActive(false);
     }
@@ -51,10 +50,10 @@ public class MainMenu : MonoBehaviour
             if (terrain.Id == 3) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, 400); }
             if (terrain.Id == 4) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(280, 400); }
             if (terrain.Id == 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(550, 400); }
-            if (terrain.Id == 6) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(380, 150); }
-            if (terrain.Id == 7) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(720, 150); }
-            if (terrain.Id == 8) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(380, -150); }
-            if (terrain.Id == 9) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(720, -150); }
+            if (terrain.Id == 6) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(380, -150); }
+            if (terrain.Id == 7) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(720, -150); }
+            if (terrain.Id == 8) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(380, 150); }
+            if (terrain.Id == 9) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(720, 150); }
             if (terrain.Id == 10) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(550, 0); }
         }
     }
@@ -64,7 +63,7 @@ public class MainMenu : MonoBehaviour
 
     public void MAJ()
     {
-        if (JeuEnCours.FamillesChoisies.Count == 2 && TypePartie != "")
+        if (JeuEnCours.FamillesChoisies.Count == 2 && JeuEnCours.TypePartie != "")
         { BoutonNext.interactable = true; }
         else { BoutonNext.interactable = false; }
     }
