@@ -20,11 +20,16 @@ MonoBehaviour:
   PVar: 40
   PA: 10
   IdPouvoir: 2
+  IdPouvoirVar: 2
   Pouvoir: Soigne 10 PV
-  CoutPouvoir: 2
+  PouvoirVar: Soigne 10 PV
+  CoutPouvoir: 1
+  CoutPouvoirVar: 1
   Famille: Bleue
   FamilleImage: {fileID: 21300000, guid: 9d8a533f149825449b17d38b2b8de220, type: 3}
   Type: Defenseur
   TypeImage: {fileID: 21300000, guid: d9c1c05dba029894a852a8232e27c84c, type: 3}
   liens:
+  - {fileID: 11400000, guid: eb32b44e8b9301144836458920698260, type: 2}
+  liensvar:
   - {fileID: 11400000, guid: eb32b44e8b9301144836458920698260, type: 2}

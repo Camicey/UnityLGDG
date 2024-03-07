@@ -160,10 +160,10 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator ChoixDeStratege() // Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
     {
-        FondColore.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 245);
+        FondColore.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 320);
         ActionEnCoursTexte.text = "Choisissez un stratège, glissez le dans la case du centre".ToString();
         yield return new WaitUntil(() => JoueurActif.Terrain[0].CartePlacee != null);
-        FondColore.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 830);
+        FondColore.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 800);
         JoueurActif.Terrain[0].CartePlacee.Stratege = true;
         AfficherPM();
     }
@@ -187,7 +187,6 @@ public class GameManager : MonoBehaviour
         {
             EnTrainCibleCarte = true;
             //Ecran derrière, possibilité de tapper. Tant qu'on ne choisit pas
-            ActionEnCoursTexte.text = "Choisissez une cible, une personne à attaquer".ToString();
             EnleverBonBoutons();
             if (CarteMontree.Appartenance == JoueurActif) { StartCoroutine(AttendreCiblee()); }
         }
@@ -251,7 +250,6 @@ public class GameManager : MonoBehaviour
         if (PMEnCours >= 1)
         {
             EnTrainCibleTerrain = true;
-            ActionEnCoursTexte.text = "Choisissez où vous déplacer".ToString();
             EnleverBonBoutons();
             StartCoroutine(AttendreTerrainCiblee());
         }
@@ -315,7 +313,6 @@ public class GameManager : MonoBehaviour
         if (PMEnCours >= 2)
         {
             EnTrainCibleCarte = true;
-            ActionEnCoursTexte.text = "Choisissez avec qui vous voulez échanger votre carte".ToString();
             EnleverBonBoutons();
             StartCoroutine(AttendreCibleeEchange());
         }
@@ -487,7 +484,6 @@ public class GameManager : MonoBehaviour
                     break;
                 case 7: //Téléporter
                     EnTrainCibleTerrain = true;
-                    ActionEnCoursTexte.text = "Choisissez où vous déplacer".ToString();
                     EnleverBonBoutons();
                     StartCoroutine(Teleporter());
                     break;
