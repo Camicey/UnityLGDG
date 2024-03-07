@@ -26,13 +26,13 @@ public class GameManager : MonoBehaviour
     public Image Selection;
     public Sprite ImageDosCarte;
     public int Tour { get; protected set; }
-    public float PMEnCours { get; set; }
-    public Text PMEnCoursTexte { get; set; }
-    public Text WarningTexte { get; set; }
-    public Text ActionEnCoursTexte { get; set; }
-    public string TypePartie { get; set; }
-    public bool EnTrainCibleCarte { get; set; }
-    public bool EnTrainCibleTerrain { get; set; }
+    public float PMEnCours;
+    public Text PMEnCoursTexte;
+    public Text WarningTexte;
+    public Text ActionEnCoursTexte;
+    public string TypePartie;
+    public bool EnTrainCibleCarte;
+    public bool EnTrainCibleTerrain;
 
     void Start()
     {
@@ -526,7 +526,7 @@ public class GameManager : MonoBehaviour
         ConditionDeVictoire();
     }
 
-    IEnumerator CreerLien()
+    public IEnumerator CreerLien()
     {
         CommencerPouvoir("Choisissez avec qui va avoir un nouveau lien.", true);
         yield return new WaitUntil(() => CarteCiblee != null);
@@ -555,7 +555,7 @@ public class GameManager : MonoBehaviour
         else { FinirPouvoir("On ne peut pas avoir plus de 4 liens.", true, false); }
     }
 
-    IEnumerator Teleporter()
+    public IEnumerator Teleporter()
     {
         CommencerPouvoir("Choisissez avec qui va être immobilisé.", false);
         yield return new WaitUntil(() => TerrainCiblee != null);
@@ -571,7 +571,7 @@ public class GameManager : MonoBehaviour
         }
 
     }
-    IEnumerator Immobiliser()
+    public IEnumerator Immobiliser()
     {
         CommencerPouvoir("Choisissez avec qui va être immobilisé.", true);
         yield return new WaitUntil(() => CarteCiblee != null);

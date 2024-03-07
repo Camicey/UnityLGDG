@@ -1,13 +1,28 @@
 @startuml DiagrammeUML
 class Joueur
 class Carte
-class Jeu
-class Terrain
+class GameManager
+class PlaceTerrain
+class PlaceDeck
+class CarteSettings
+class GrosseCarte
+class ChoixDeFamille
+class MainMenu
+class BoutonChoix
 
-Joueur -- Terrain : < est associé à 1
-Joueur - Jeu : > participe à 1
+Joueur -- PlaceTerrain : < est associé à 1
+Joueur - GameManager : > participe à 1
 Carte - Joueur : < possède 0..n
-Carte - Jeu : > compose n..m
+Carte - GameManager : > compose n..m
+CarteSettings -- Carte : < est lié à 1
+BoutonChoix - GameManager
+ChoixDeFamille - MainMenu 
+MainMenu - GameManager
+GrosseCarte - Carte
+PlaceDeck - Joueur
+PlaceDeck -- GameManager
+PlaceTerrain -- GameManager
+
 
 class Joueur {
     Id : int
@@ -170,18 +185,63 @@ class Carte {
 }
 
 class GrosseCarte {
+    Carte : CarteSettings 
+    IdT : Text
+    Text: Text
+    ImageT : Image
+    PMT : Text
+    PVT : Text
+    PAT : Text
+    PouvoirT : Text
+    CoutPouvoirT: Text
+    FamilleImageT : Image
+    TypeImageT : Image
+    LiensT: Text
 
+    Montrer()
+    MontrerLiens()
+    SeDecaler(CarteSettings, Bool)
 }
 
 class ChoixDeFamille {
-    
+    EstActive : bool
+    Famille : string
+    Menu : MainMenu 
+
+    Start()
+    Selectionner()
+    SelectionnerTypePartie()
 }
 
 class MainMenu {
+    JeuEnCours : GameManager 
+    Ecran : GameObject 
+    MenuPauseUI : GameObject 
+    BoutonNext : Button
+    List<PlaceTerrain> ToutTerrain
+    ImageGrandePartie : GameObject 
+    JeuEnPause : bool
 
+    Start()
+    Famille()
+    Jouer()
+    InitialiserLonguePartie()
+    Quitter()
+    RetourAuMenu()
+    MAJ()
+    Update()
+    Reprendre()
+    Pause()
 }
-class BoutonChoix {
 
+class BoutonChoix {
+    Utilite : string
+    JeuEnCours : GameManager
+    EstMontree : bool
+
+    Start()
+    Montrer()
+    Cacher()
 }
 
 @enduml
