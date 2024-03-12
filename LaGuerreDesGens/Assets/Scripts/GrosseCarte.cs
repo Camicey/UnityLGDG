@@ -7,15 +7,11 @@ public class GrosseCarte : MonoBehaviour
 {
     public CarteSettings Carte;
 
-    public Text IdT;
     public Text PrenomT;
-
     public Image ImageT;
-
     public Text PMT;
     public Text PVT;
     public Text PAT;
-
     public Text PouvoirT;
     public Text CoutPouvoirT;
     public Image FamilleImageT;
@@ -23,9 +19,13 @@ public class GrosseCarte : MonoBehaviour
     public Text LiensT;
 
     // Start is called before the first frame update
+
+    public void Start()
+    {
+        this.gameObject.SetActive(true);
+    }
     public void Montrer()
     {
-        IdT.text = Carte.Id.ToString();
         PrenomT.text = Carte.Prenom;
         ImageT.sprite = Carte.Image;
         PMT.text = Carte.PM.ToString();
@@ -45,23 +45,21 @@ public class GrosseCarte : MonoBehaviour
         {
             description += lien.Prenom + "\n";
         }
-
         if (description == " ") { description = "Personne"; }
-
         return description;
     }
 
-    public void SeDecaler(CarteSettings carteMontree, bool montree) //Montre la carte
+    public void SeDecaler(CarteSettings carteMontree, bool montrer) //Montre la carte
     {
-        if (montree == true)
+        if (montrer == true)
         {
             Carte = carteMontree;
             Montrer();
-            GetComponent<RectTransform>().anchoredPosition = new Vector2(-660, 0);
+            GetComponent<RectTransform>().anchoredPosition = new Vector2(-660, 0); //Montrer la grande carte
         }
         else
         {
-            GetComponent<RectTransform>().anchoredPosition = new Vector2(-1600, 0);
+            GetComponent<RectTransform>().anchoredPosition = new Vector2(-1600, 0); //Cacher la grande carte
         }
     }
 

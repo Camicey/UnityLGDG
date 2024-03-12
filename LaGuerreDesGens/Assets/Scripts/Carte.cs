@@ -6,13 +6,13 @@ using UnityEngine.EventSystems;
 
 public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
 {
-    [SerializeField] private Canvas canvas;
+    [SerializeField] public Canvas canvas;
     private CanvasGroup canvasGroup;
     public RectTransform rectTransform;
 
     public int Id;
     public CarteSettings Stats;
-    public List<Carte> Liens = new List<Carte>();
+    //public List<Carte> Liens = new List<Carte>();
     public bool EstCachee = false; //Est cachée à l'adversaire
     public bool EstEnJeu = false; //Est sur le plateau
     public bool Stratege = false; //Est un stratège
@@ -26,18 +26,63 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     public PlaceTerrain PlaceDeTerrain;
     public Sprite ImageOriginale;
 
+    public Text PrenomT;
+
+    public Image ImageT;
+
+    public Text PMT;
+    public Text PVT;
+    public Text PAT;
+
+    public Text PouvoirT;
+    public Text CoutPouvoirT;
+    public Image FamilleImageT;
+    public Image TypeImageT;
+    public Text LiensT;
 
     // Start is called before the first frame update
-    public void Start()
+    public void Montrer()
+    {
+        PrenomT.text = Stats.Prenom;
+        ImageT.sprite = Stats.Image;
+        ImageT.enabled = true;
+        PMT.text = Stats.PM.ToString();
+        PVT.text = Stats.PVar.ToString();
+        PAT.text = Stats.PA.ToString();
+        PouvoirT.text = Stats.PouvoirVar;
+        CoutPouvoirT.text = Stats.CoutPouvoirVar.ToString() + "PM";
+        FamilleImageT.sprite = Stats.FamilleImage;
+        TypeImageT.sprite = Stats.TypeImage;
+        TypeImageT.enabled = true;
+        LiensT.text = MontrerLiens();
+    }
+
+    public string MontrerLiens()
+    {
+        string description = " ";
+        foreach (CarteSettings lien in Stats.liensvar)
+        {
+            description += lien.Prenom + "\n";
+        }
+
+        if (description == " ") { description = "Personne"; }
+
+        return description;
+    }
+
+    // Start is called before the first frame update
+    public void Commencer()
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         PositionBase = rectTransform.anchoredPosition;
+        Montrer();
         JeuEnCours.ToutesLesCartes.Add(this);
     }
 
     public void Initialiser()
     {
+        Id = Stats.Id;
         Stats.PVar = Stats.PV;
         Stats.PouvoirVar = Stats.Pouvoir;
         Stats.IdPouvoirVar = Stats.IdPouvoir;
@@ -53,6 +98,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         Stratege = false;
         Immobile = 0;
         AUtilisePouvoir = false;
+        Montrer();
         GetComponent<RectTransform>().anchoredPosition = new Vector2(-1200, 0);
         if (Stats.Famille == JeuEnCours.FamillesChoisies[0] || Stats.Famille == JeuEnCours.FamillesChoisies[1])
         { JeuEnCours.Pioche.Add(this); } //Mettre les cartes des familles choisies dans la pioche
@@ -62,8 +108,8 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     {
         if (EstEnJeu == false)
         {
-            rectTransform.sizeDelta = new Vector2(336, 504);
             this.gameObject.transform.Translate(90, 180, 1.5f);
+            this.gameObject.transform.localScale = Vector3.one * 1.3f;
             rectTransform.SetAsLastSibling(); // Met la carte devant les autres
         }
     }
@@ -71,8 +117,8 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
     {
         if (EstEnJeu == false)
         {
-            rectTransform.sizeDelta = new Vector2(240, 360);
             this.gameObject.transform.Translate(-90, -180, 0f);
+            this.gameObject.transform.localScale = Vector3.one * 1f;
         }
     }
 
@@ -107,9 +153,23 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         PlaceDeTerrain = null;
     }
 
+    public void MettreCarteCachee()
+    {
+        PrenomT.text = " ";
+        ImageT.enabled = false;
+        PMT.text = " ";
+        PVT.text = " ";
+        PAT.text = " ";
+        PouvoirT.text = " ";
+        CoutPouvoirT.text = " ";
+        FamilleImageT.sprite = JeuEnCours.ImageDosCarte;
+        TypeImageT.enabled = false;
+        LiensT.text = " ";
+    }
+
     public void Retourner()
     {
-        GetComponent<UnityEngine.UI.Image>().sprite = ImageOriginale;
+        Montrer();
         EstCachee = false;
     }
 
@@ -152,7 +212,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         if (JeuEnCours.EnTrainCibleCarte == true && EstEnJeu == true) { JeuEnCours.CarteCiblee = this; }
         else if (EstEnJeu == true && (EstCachee == false || JeuEnCours.JoueurActif == Appartenance)) //Si elle est montré ou qu'elle nous appartient
         {
-
+            Montrer();
             if (JeuEnCours.CarteMontree == null) //Je montre une carte
             { JeuEnCours.MontrerGrandeCarte(this); }
             else if (Id == JeuEnCours.grosseCarte.Carte.Id) //Je cache la carte
@@ -167,6 +227,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         }
         else if (EstCachee == true)
         { JeuEnCours.Warning("Vous ne pouvez pas voir cette carte."); }
+
     }
 
     public void OnDrop(PointerEventData eventData)

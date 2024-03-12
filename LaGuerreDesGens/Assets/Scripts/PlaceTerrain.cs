@@ -32,7 +32,8 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
             eventData.pointerDrag.GetComponent<Carte>().PlaceDeTerrain = this;
             if (JeuEnCours.JoueurActif.Terrain[0] != null && this == JeuEnCours.JoueurActif.Terrain[0]) { CartePlacee.EstCachee = false; }
             else { CartePlacee.EstCachee = true; }
-            CartePlacee.rectTransform.sizeDelta = GetComponent<RectTransform>().sizeDelta; //La carte se met à la taille de la case
+            if (JeuEnCours.TypePartie == "Longue") // La carte se met à la taille de la case
+            { CartePlacee.gameObject.transform.localScale = Vector3.one * 0.75f; }
             JeuEnCours.PMEnCours -= 1;
             JeuEnCours.AfficherPM();
         }
@@ -43,7 +44,6 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
             (eventData.pointerDrag.GetComponent<Carte>().Appartenance == JeuEnCours.JoueurActif).ToString() + (JeuEnCours.PMEnCours >= 1).ToString());
         }
     }
-
     public void OnPointerDown(PointerEventData eventData)
     {
         if (JeuEnCours.EnTrainCibleTerrain == true) { JeuEnCours.TerrainCiblee = this; }

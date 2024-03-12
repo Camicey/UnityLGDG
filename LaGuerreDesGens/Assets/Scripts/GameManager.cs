@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
         ChangerDeTour();
     }
 
-    public void Piocher()
+    public void Piocher() // Piocher une carte
     {
         if (Pioche.Count >= 1 && JoueurActif.APioche == false)
         {
@@ -103,16 +103,15 @@ public class GameManager : MonoBehaviour
                         if (slot.availableCarteSlots == true)
                         {
                             PMEnCours--; // Piocher coûte 1 PM
-                            AfficherPM();
-                            randCarte.gameObject.SetActive(true);
-                            randCarte.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition;
-                            slot.availableCarteSlots = false;
-                            slot.CartePlacee = randCarte;
-                            randCarte.PositionBase = slot.rectTransform.anchoredPosition;
-                            randCarte.PlaceDeDeck = slot;
-                            randCarte.Appartenance = JoueurActif;
-                            Pioche.Remove(randCarte);
+                            AfficherPM(); // Affiche les PM mis a jour
+                            randCarte.gameObject.SetActive(true); // On fait apparaitre la carte
+                            randCarte.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition; // On la place sur un slot disponible
+                            slot.availableCarteSlots = false; // On ne peut plus déposer de carte sur cette place
+                            slot.CartePlacee = randCarte; // On place la carte sur le slot
+                            randCarte.PlaceDeDeck = slot; // Le slot de la carte est ce slot
+                            randCarte.Appartenance = JoueurActif; // La carte appartient au joueur qui l'a pioché
                             JoueurActif.CartesPossedees.Add(randCarte);
+                            Pioche.Remove(randCarte); // On enlève la carte de la pioche
                             JoueurActif.APioche = true;
                             return;
                         }
@@ -200,7 +199,7 @@ public class GameManager : MonoBehaviour
         { Warning("Cette carte vous appartient !"); }
         else if (!VerifierTerrainACote(CarteCiblee.PlaceDeTerrain.Id))
         { Warning("Cette carte est trop loin !"); }
-        else if (CarteMontree.Liens.Contains(CarteCiblee))
+        else if (CarteMontree.Stats.liensvar.Contains(CarteCiblee.Stats))
         {
             Warning(CarteMontree.Stats.Prenom + " apperçoit " + CarteCiblee.Stats.Prenom + " et refuse de se battre.");
             PMEnCours--;
@@ -296,7 +295,7 @@ public class GameManager : MonoBehaviour
                     CarteMontree.EstCachee = false;
                     CarteMontree.EstEnJeu = false;
                     CarteMontree.Stratege = false;
-                    CarteMontree.rectTransform.sizeDelta = new Vector2(240, 360);
+                    CarteMontree.gameObject.transform.localScale = Vector3.one * 1f;
                     PMEnCours--;
                     CacherGrandeCarte();
                     AfficherPM();
@@ -381,7 +380,8 @@ public class GameManager : MonoBehaviour
                 BoutonsDeJeu[0].Montrer(); //Attaquer
                 BoutonsDeJeu[1].Montrer(); //Deplacer
                 BoutonsDeJeu[2].Montrer(); //Retirer
-                BoutonsDeJeu[3].Montrer(); //Pouvoir
+                if (CarteMontree.AUtilisePouvoir == false)
+                { BoutonsDeJeu[3].Montrer(); } //Pouvoir
                 BoutonsDeJeu[5].Montrer(); //Echanger
                 break;
             case "StrategeAllie":
@@ -418,15 +418,16 @@ public class GameManager : MonoBehaviour
                 posCarte.y = (posCarte.y - 540) * -1 + 540; // Incantation du démon pour passer de l'autre côté
                 carte.gameObject.transform.position = posCarte; // On applique la transformation de la carte
                 if (carte.EstCachee == true && carte.Appartenance == JoueurActif) // Si les cartes sont visibles
-                { carte.GetComponent<UnityEngine.UI.Image>().sprite = ImageDosCarte; } //Cacher carte
+                { carte.MettreCarteCachee(); } //Cacher carte
                 else if ((carte.EstCachee == true && carte.Appartenance == JoueurPassif) || carte.Stratege == true) // Si les cartes sont visibles
-                { carte.GetComponent<UnityEngine.UI.Image>().sprite = carte.ImageOriginale; } //Montrer carte
+                { carte.Montrer(); } //Montrer carte
             }
             var pos = terrain.gameObject.transform.position;
             pos.y = (pos.y - 540) * -1 + 540; // Transformation du terrain
             terrain.gameObject.transform.position = pos;
         }
     }
+
     public void CacherGrandeCarte()
     {
         grosseCarte.SeDecaler(CarteMontree.Stats, false); // On cache la carte
@@ -438,7 +439,7 @@ public class GameManager : MonoBehaviour
     {
         CarteMontree = carteMontree;
         grosseCarte.SeDecaler(CarteMontree.Stats, true); // Montrer la grande carte
-                                                         // Les deux premiers tours on ne laisse pas les joueurs agir et si la carte est immobilisée
+        // Les deux premiers tours on ne laisse pas les joueurs agir et si la carte est immobilisée
         if (Tour > 2 && CarteMontree.Immobile == 0) { CarteMontree.MettreBonBoutons(); }
         if (TypePartie == "Longue") { Selection.rectTransform.sizeDelta = new Vector2(200, 290); } // Change la taille en fonction de la partie
         else { Selection.rectTransform.sizeDelta = new Vector2(265, 385); }
@@ -521,7 +522,6 @@ public class GameManager : MonoBehaviour
         }
         ConditionDeVictoire();
     }
-
     public IEnumerator CreerLien()
     {
         CommencerPouvoir("Choisissez avec qui va avoir un nouveau lien.", true);
@@ -534,23 +534,14 @@ public class GameManager : MonoBehaviour
         CarteCiblee.Retourner();
         if (CarteCiblee.Id == carteAttente.Id)
         { FinirPouvoir("L'amour de soi est toujours important.", true, false); }
-        else if (CarteCiblee.Liens.Count < 4 && carteAttente.Liens.Count < 4)
+        else if (CarteCiblee.Stats.liensvar.Count < 4 && carteAttente.Stats.liensvar.Count < 4)
         {
-            if (!CarteCiblee.Liens.Contains(carteAttente))
-            {
-                CarteCiblee.Liens.Add(carteAttente);
-                CarteCiblee.Stats.liensvar.Add(carteAttente.Stats);
-            }
-            if (!carteAttente.Liens.Contains(CarteCiblee))
-            {
-                carteAttente.Liens.Add(CarteCiblee);
-                carteAttente.Stats.liensvar.Add(CarteCiblee.Stats);
-            }
+            if (!CarteCiblee.Stats.liensvar.Contains(carteAttente.Stats)) { CarteCiblee.Stats.liensvar.Add(carteAttente.Stats); }
+            if (!carteAttente.Stats.liensvar.Contains(CarteCiblee.Stats)) { carteAttente.Stats.liensvar.Add(CarteCiblee.Stats); }
             FinirPouvoir(CarteCiblee.Stats.Prenom + " a maintenant un lien avec " + carteAttente.Stats.Prenom, true, true);
         }
         else { FinirPouvoir("On ne peut pas avoir plus de 4 liens.", true, false); }
     }
-
     public IEnumerator Teleporter()
     {
         CommencerPouvoir("Choisissez avec qui va être immobilisé.", false);
@@ -618,7 +609,6 @@ public class GameManager : MonoBehaviour
     {
         CommencerPouvoir("Choisissez qui va perdre tous ses liens par " + CarteMontree.Stats.Prenom, true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        CarteCiblee.Liens.Clear();
         CarteCiblee.Stats.liensvar.Clear();
         FinirPouvoir(CarteCiblee.Stats.Prenom + " a perdu tous ses liens.", true, true);
     }
@@ -631,9 +621,20 @@ public class GameManager : MonoBehaviour
     }
     private void FinirPouvoir(string texte, bool carteCiblee, bool enleverPM)
     {
-        if (carteCiblee == true) { CarteCiblee = null; EnTrainCibleCarte = false; }
-        else { TerrainCiblee = null; EnTrainCibleTerrain = false; ToutTerrain.transform.SetAsFirstSibling(); }
+        if (carteCiblee == true)
+        {
+            CarteCiblee.Montrer();
+            CarteCiblee = null;
+            EnTrainCibleCarte = false;
+        }
+        else
+        {
+            TerrainCiblee = null;
+            EnTrainCibleTerrain = false;
+            ToutTerrain.transform.SetAsFirstSibling();
+        }
         CarteMontree.AUtilisePouvoir = true;
+        CarteMontree.Montrer();
         if (CarteMontree.Stats.IdPouvoir != 8 && enleverPM == true) { PMEnCours = PMEnCours - CarteMontree.Stats.CoutPouvoirVar; }
         Warning(texte);
         CacherGrandeCarte();
