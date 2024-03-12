@@ -109,6 +109,7 @@ public class GameManager : MonoBehaviour
                             slot.availableCarteSlots = false; // On ne peut plus déposer de carte sur cette place
                             slot.CartePlacee = randCarte; // On place la carte sur le slot
                             randCarte.PlaceDeDeck = slot; // Le slot de la carte est ce slot
+                            randCarte.PositionBase = slot.rectTransform.anchoredPosition;
                             randCarte.Appartenance = JoueurActif; // La carte appartient au joueur qui l'a pioché
                             JoueurActif.CartesPossedees.Add(randCarte);
                             Pioche.Remove(randCarte); // On enlève la carte de la pioche
@@ -129,6 +130,8 @@ public class GameManager : MonoBehaviour
         Warning("On change de tour : " + Tour.ToString() + ". C'est au tour de : " + JoueurPassif.Prenom);
         JoueurActif.APioche = false;
         Tour++;
+        if (CarteMontree != null) { CacherGrandeCarte(); } // Cacher la carte montrée
+
         foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
         {
             slot.gameObject.SetActive(false);
@@ -146,8 +149,6 @@ public class GameManager : MonoBehaviour
         }
         EchangeDeTerrain(JoueurActif); // On échange les terrains de côté
         EchangeDeTerrain(JoueurPassif);
-
-        if (CarteMontree != null) { CacherGrandeCarte(); } // Retirer la carte montrée
 
         if (Tour % 2 == 0) { JoueurActif = J2; JoueurPassif = J1; } // Changement de joueur
         else { JoueurActif = J1; JoueurPassif = J2; }
@@ -237,6 +238,7 @@ public class GameManager : MonoBehaviour
                 { CarteMontree.Mourir(); }
             }
             else { CarteCiblee.Mourir(); }
+            CarteCiblee.Montrer();
         }
         CarteCiblee = null;
         EnTrainCibleCarte = false;
@@ -432,6 +434,7 @@ public class GameManager : MonoBehaviour
     {
         grosseCarte.SeDecaler(CarteMontree.Stats, false); // On cache la carte
         EnleverBonBoutons();
+        CarteMontree.Montrer();
         CarteMontree = null;
         Selection.rectTransform.anchoredPosition = new Vector2(-1200, 0); // On déplace la sélection
     }
@@ -500,21 +503,21 @@ public class GameManager : MonoBehaviour
                     { if (terrain.CartePlacee != null) { terrain.CartePlacee.Retourner(); } }
                     foreach (PlaceTerrain terrain in JoueurPassif.Terrain) // Je parcoure le terrain de l'ennemi
                     { if (terrain.CartePlacee != null) { terrain.CartePlacee.Retourner(); } }
-                    Warning("Tout le monde a été découvert par " + CarteMontree.Stats.Prenom);
+                    FinirPouvoir("Tout le monde a été découvert par " + CarteMontree.Stats.Prenom, false, true);
                     break;
                 case 11: // Retourner la Famille Rose
                     foreach (PlaceTerrain terrain in JoueurActif.Terrain)
                     { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Famille == "Rose") { terrain.CartePlacee.Retourner(); } }
                     foreach (PlaceTerrain terrain in JoueurPassif.Terrain)
                     { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Famille == "Rose") { terrain.CartePlacee.Retourner(); } }
-                    Warning("Toutes les cartes roses ont été découvertes par " + CarteMontree.Stats.Prenom);
+                    FinirPouvoir("Toutes les cartes roses ont été découvertes par " + CarteMontree.Stats.Prenom, false, true);
                     break;
                 case 12: //Retourner Piege
                     foreach (PlaceTerrain terrain in JoueurActif.Terrain)
                     { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.Retourner(); } }
                     foreach (PlaceTerrain terrain in JoueurPassif.Terrain)
                     { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.Retourner(); } }
-                    Warning("Tout les pièges ont été découvert par " + CarteMontree.Stats.Prenom);
+                    FinirPouvoir("Tout les pièges ont été découvert par " + CarteMontree.Stats.Prenom, false, true);
                     break;
                 default:
                     break;
@@ -562,7 +565,6 @@ public class GameManager : MonoBehaviour
     {
         CommencerPouvoir("Choisissez avec qui va être immobilisé.", true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        CarteCiblee.Retourner();
         CarteMontree.Stats.PVar = CarteMontree.Stats.PVar - 10;
         if (CarteMontree.Stats.PVar <= 0) { CarteMontree.Mourir(); }
         CarteCiblee.Immobile = 2;
@@ -591,7 +593,6 @@ public class GameManager : MonoBehaviour
     {
         CommencerPouvoir("Choisissez avec qui va perdre son pouvoir.", true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        CarteCiblee.Retourner();
         CarteCiblee.Stats.PouvoirVar = "Plus de pouvoir.";
         CarteCiblee.Stats.IdPouvoirVar = 0;
         CarteCiblee.Stats.CoutPouvoirVar = 0;
@@ -623,18 +624,19 @@ public class GameManager : MonoBehaviour
     {
         if (carteCiblee == true)
         {
+            CarteCiblee.Retourner();
             CarteCiblee.Montrer();
+            CarteMontree.Retourner();
             CarteCiblee = null;
             EnTrainCibleCarte = false;
         }
-        else
+        else if (TerrainCiblee != null)
         {
             TerrainCiblee = null;
             EnTrainCibleTerrain = false;
             ToutTerrain.transform.SetAsFirstSibling();
         }
         CarteMontree.AUtilisePouvoir = true;
-        CarteMontree.Montrer();
         if (CarteMontree.Stats.IdPouvoir != 8 && enleverPM == true) { PMEnCours = PMEnCours - CarteMontree.Stats.CoutPouvoirVar; }
         Warning(texte);
         CacherGrandeCarte();
