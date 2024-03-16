@@ -10,7 +10,6 @@ public class MainMenu : MonoBehaviour
     public GameObject Ecran;
     public GameObject MenuPauseUI;
     public Button BoutonNext;
-    public List<PlaceTerrain> ToutTerrain = new List<PlaceTerrain>();
     public GameObject ImageGrandePartie;
     public static bool JeuEnPause = false;
 
@@ -21,7 +20,7 @@ public class MainMenu : MonoBehaviour
         if (MenuPauseUI != null) { MenuPauseUI.SetActive(false); }
         if (BoutonNext != null) { BoutonNext.interactable = false; }
         if (JeuEnCours != null) { JeuEnCours.FamillesChoisies.Clear(); }
-        foreach (PlaceTerrain terrain in ToutTerrain)
+        foreach (PlaceTerrain terrain in JeuEnCours.ToutTerrain)
         {
             if (terrain.Id > 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(1200, 0); }
         }
@@ -35,6 +34,9 @@ public class MainMenu : MonoBehaviour
     public void Jouer()
     {
         if (JeuEnCours.TypePartie == "Longue") { InitialiserLonguePartie(); }
+        else { InitialiserPetitePartie(); }
+        PlacerDeck(JeuEnCours.J1);
+        PlacerDeck(JeuEnCours.J2);
         JeuEnCours.NouvellePartie();
         Ecran.SetActive(false);
     }
@@ -42,14 +44,14 @@ public class MainMenu : MonoBehaviour
     public void InitialiserLonguePartie()
     {
         ImageGrandePartie.transform.Translate(0, 0, -3f);
-        foreach (PlaceTerrain terrain in ToutTerrain)
+        foreach (PlaceTerrain terrain in JeuEnCours.ToutTerrain)
         {
             if (terrain.Id == 0) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(550, -400); }
             if (terrain.Id == 1) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(280, -400); }
             if (terrain.Id == 2) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, -400); }
-            if (terrain.Id == 3) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, 400); }
+            if (terrain.Id == 3) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(550, 400); }
             if (terrain.Id == 4) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(280, 400); }
-            if (terrain.Id == 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(550, 400); }
+            if (terrain.Id == 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, 400); }
             if (terrain.Id == 6) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(380, -150); }
             if (terrain.Id == 7) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(720, -150); }
             if (terrain.Id == 8) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(380, 150); }
@@ -57,6 +59,26 @@ public class MainMenu : MonoBehaviour
             if (terrain.Id == 10) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(550, 0); }
         }
     }
+
+    public void InitialiserPetitePartie()
+    {
+        foreach (PlaceTerrain terrain in JeuEnCours.ToutTerrain)
+        {
+            if (terrain.Id == 0) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(560, -330); }
+            if (terrain.Id == 1) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(300, -230); }
+            if (terrain.Id == 2) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, -230); }
+            if (terrain.Id == 3) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(560, 330); }
+            if (terrain.Id == 4) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(300, 230); }
+            if (terrain.Id == 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, 230); }
+        }
+    }
+
+    public void PlacerDeck(Joueur joueur)
+    {
+        for (int i = 0; i < 5; i++)
+        { joueur.Deck[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(-892 + i * 182, -485); }
+    }
+
     public void Quitter() { Application.Quit(); }
 
     public void RetourAuMenu() { SceneManager.LoadScene("Menu"); }

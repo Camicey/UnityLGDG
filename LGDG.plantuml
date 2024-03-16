@@ -51,6 +51,7 @@ class PlaceTerrain {
 }
 
 class PlaceDeck {
+    Id : int
     Appartenance : Joueur
     JeuEnCours : GameManager
     availableCarteSlots : bool

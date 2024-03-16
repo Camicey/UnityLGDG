@@ -9,19 +9,20 @@ public class GameManager : MonoBehaviour
     public Joueur J1;
     public Joueur J2;
     public Joueur JoueurActif;
-    protected Joueur JoueurPassif;
+    public Joueur JoueurPassif;
     public List<string> FamillesChoisies = new List<string>();
     public List<Carte> ToutesLesCartes = new List<Carte>();
     public List<Carte> Pioche = new List<Carte>();
     public List<Carte> Defausse = new List<Carte>();
     public List<CarteSettings> CartesMontrable = new List<CarteSettings>();
+    public List<PlaceTerrain> ToutTerrain = new List<PlaceTerrain>();
     public List<BoutonChoix> BoutonsDeJeu = new List<BoutonChoix>();
     public GrosseCarte grosseCarte;
     public Carte CarteMontree;
     public Carte CarteCiblee; //Carte ciblée dans une attaque
     public int DegatCiblee;
     public PlaceTerrain TerrainCiblee;
-    public GameObject ToutTerrain;
+    public GameObject DossierTerrain;
     public GameObject FondColore;
     public Image Selection;
     public Sprite ImageDosCarte;
@@ -56,21 +57,21 @@ public class GameManager : MonoBehaviour
         //Tous les Start()
         JoueurActif.Start();
         JoueurPassif.Start();
+
+        //Tous les Initialiser()
+        foreach (PlaceTerrain slot in ToutTerrain) { slot.Initialiser(); }
+        foreach (Carte carte in ToutesLesCartes) { carte.Initialiser(); } // Mettre les cartes dans la pioche
+        if (CarteMontree != null) { CacherGrandeCarte(); }
         foreach (PlaceDeck slot in JoueurActif.Deck)
         {
             slot.gameObject.SetActive(true);
-            slot.Start();
+            slot.Initialiser();
         }
         foreach (PlaceDeck slot in JoueurPassif.Deck)
         {
             slot.gameObject.SetActive(false);
-            slot.Start();
+            slot.Initialiser();
         }
-        //Tous les Initialiser()
-        foreach (PlaceTerrain slot in JoueurActif.Terrain) { slot.Initialiser(); }
-        foreach (PlaceTerrain slot in JoueurPassif.Terrain) { slot.Initialiser(); }
-        foreach (Carte carte in ToutesLesCartes) { carte.Initialiser(); } // Mettre les cartes dans la pioche
-        if (CarteMontree != null) { CacherGrandeCarte(); }
 
         // La, on pioche les cartes du tout début de partie
         PMEnCours = 4;
@@ -130,7 +131,7 @@ public class GameManager : MonoBehaviour
         Warning("On change de tour : " + Tour.ToString() + ". C'est au tour de : " + JoueurPassif.Prenom);
         JoueurActif.APioche = false;
         Tour++;
-        if (CarteMontree != null) { CacherGrandeCarte(); } // Cacher la carte montrée
+        if (CarteMontree != null) { CacherGrandeCarte(); }
 
         foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
         {
@@ -147,7 +148,7 @@ public class GameManager : MonoBehaviour
             carte.AUtilisePouvoir = false;
             if (carte.Immobile > 0) { carte.Immobile--; } // C'est pour le pouvoir 4
         }
-        EchangeDeTerrain(JoueurActif); // On échange les terrains de côté
+        EchangeDeTerrain(JoueurActif);
         EchangeDeTerrain(JoueurPassif);
 
         if (Tour % 2 == 0) { JoueurActif = J2; JoueurPassif = J1; } // Changement de joueur
@@ -158,7 +159,7 @@ public class GameManager : MonoBehaviour
         else if (Tour > 2 && JoueurActif.TrouverStratege() == null) { PMEnCours = 4; Piocher(); StartCoroutine(ChoixDeStratege()); }
         AfficherPM();
     }
-    IEnumerator ChoixDeStratege() // Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège INCROYABLE
+    IEnumerator ChoixDeStratege() // Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège
     {
         FondColore.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 320);
         ActionEnCoursTexte.text = "Choisissez un stratège, glissez le dans la case du centre".ToString();
@@ -196,7 +197,7 @@ public class GameManager : MonoBehaviour
     {
         Warning("Choisissez avec qui " + CarteMontree.Stats.Prenom + " va se battre.");
         yield return new WaitUntil(() => CarteCiblee != null);
-        if (CarteCiblee.Appartenance == JoueurActif) // Vérifier que la carte est à côtée // Vérifier que la carte n'est pas liée
+        if (CarteCiblee.Appartenance == JoueurActif)
         { Warning("Cette carte vous appartient !"); }
         else if (!VerifierTerrainACote(CarteCiblee.PlaceDeTerrain.Id))
         { Warning("Cette carte est trop loin !"); }
@@ -258,7 +259,7 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator AttendreTerrainCiblee()
     {
-        ToutTerrain.transform.SetAsLastSibling();
+        DossierTerrain.transform.SetAsLastSibling();
         yield return new WaitUntil(() => TerrainCiblee != null);
         if (!VerifierTerrainACote(TerrainCiblee.Id)) { Warning("Ce terrain est trop loin !"); }
         else if (TerrainCiblee.CartePlacee != null)
@@ -273,7 +274,7 @@ public class GameManager : MonoBehaviour
             Warning(CarteMontree.Stats.Prenom + " s'est déplacé(e).");
             AfficherPM();
         }
-        ToutTerrain.transform.SetAsFirstSibling();
+        DossierTerrain.transform.SetAsFirstSibling();
         EnTrainCibleTerrain = false;
         TerrainCiblee = null;
         CacherGrandeCarte();
@@ -319,7 +320,7 @@ public class GameManager : MonoBehaviour
         }
         else { Warning("Pas assez de PM pour échanger les cartes."); }
     }
-    IEnumerator AttendreCibleeEchange()
+    IEnumerator AttendreCibleeEchange() //Permet d'échanger deux cartes
     {
         Warning("Choisissez avec qui " + CarteMontree.Stats.Prenom + " va échanger de place.");
         yield return new WaitUntil(() => CarteCiblee != null);
@@ -331,7 +332,7 @@ public class GameManager : MonoBehaviour
         { Warning("On échange pas le stratège de place !"); }
         else
         {
-            PMEnCours -= 2; // Pour le pouvoir de Edwin
+            PMEnCours -= 2;
             if (CarteMontree.Stats.IdPouvoir == 8 && CarteMontree.AUtilisePouvoir == false)
             { PMEnCours++; CarteMontree.AUtilisePouvoir = true; }
             Warning(CarteMontree.Stats.Prenom + " a échanger de place avec " + CarteCiblee.Stats.Prenom);
@@ -356,20 +357,20 @@ public class GameManager : MonoBehaviour
         CacherGrandeCarte();
         AfficherPM();
     }
-    public bool VerifierTerrainACote(int terrain)
+    public bool VerifierTerrainACote(int terrain) // Vérifier que la carte est à côtée 
     {
         int IdMontree = CarteMontree.PlaceDeTerrain.Id;
         if (IdMontree == 0 && (terrain == 1 || terrain == 2 || ((terrain == 6 || terrain == 7) && StrategeSeul()))) { return true; }
-        else if (IdMontree == 5 && (terrain == 3 || terrain == 4 || ((terrain == 8 || terrain == 9) && StrategeSeul()))) { return true; }
+        else if (IdMontree == 3 && (terrain == 5 || terrain == 4 || ((terrain == 8 || terrain == 9) && StrategeSeul()))) { return true; }
         else if (IdMontree == 1 && (terrain == 0 || (terrain == 2 && TypePartie != "Longue") || terrain == 4 || terrain == 6)) { return true; }
-        else if (IdMontree == 2 && (terrain == 0 || (terrain == 1 && TypePartie != "Longue") || terrain == 3 || terrain == 7)) { return true; }
-        else if (IdMontree == 3 && (terrain == 2 || (terrain == 4 && TypePartie != "Longue") || terrain == 5 || terrain == 9)) { return true; }
-        else if (IdMontree == 4 && (terrain == 1 || (terrain == 3 && TypePartie != "Longue") || terrain == 5 || terrain == 8)) { return true; }
+        else if (IdMontree == 2 && (terrain == 0 || (terrain == 1 && TypePartie != "Longue") || terrain == 5 || terrain == 7)) { return true; }
+        else if (IdMontree == 5 && (terrain == 2 || (terrain == 4 && TypePartie != "Longue") || terrain == 3 || terrain == 9)) { return true; }
+        else if (IdMontree == 4 && (terrain == 1 || (terrain == 5 && TypePartie != "Longue") || terrain == 3 || terrain == 8)) { return true; }
         //Terrains grandes parties
         else if (IdMontree == 6 && ((terrain == 0 && J1.Terrain[1].CartePlacee == null) || terrain == 1 || terrain == 7 || terrain == 8 || terrain == 10)) { return true; }
         else if (IdMontree == 7 && ((terrain == 0 && J1.Terrain[2].CartePlacee == null) || terrain == 2 || terrain == 6 || terrain == 9 || terrain == 10)) { return true; }
-        else if (IdMontree == 8 && ((terrain == 5 && J1.Terrain[1].CartePlacee == null) || terrain == 4 || terrain == 6 || terrain == 9 || terrain == 10)) { return true; }
-        else if (IdMontree == 9 && ((terrain == 5 && J1.Terrain[2].CartePlacee == null) || terrain == 3 || terrain == 7 || terrain == 8 || terrain == 10)) { return true; }
+        else if (IdMontree == 8 && ((terrain == 3 && J1.Terrain[1].CartePlacee == null) || terrain == 4 || terrain == 6 || terrain == 9 || terrain == 10)) { return true; }
+        else if (IdMontree == 9 && ((terrain == 3 && J1.Terrain[2].CartePlacee == null) || terrain == 5 || terrain == 7 || terrain == 8 || terrain == 10)) { return true; }
         else if (IdMontree == 10 && (terrain == 6 || terrain == 7 || terrain == 8 || terrain == 9)) { return true; }
 
         return false;
@@ -408,7 +409,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void EchangeDeTerrain(Joueur J1)
+    public void EchangeDeTerrain(Joueur J1) // On échange les terrains de côté 
     {
         Carte carte;
         foreach (PlaceTerrain terrain in J1.Terrain)
@@ -451,7 +452,7 @@ public class GameManager : MonoBehaviour
         else { Selection.color = Color.blue; } // Change la couleur en fonction d'ennemi (rouge) ou allié (bleu)
     }
     public bool ConditionDeVictoire()
-    {// Si un des joueurs n'a plus de carte
+    {
         if (Pioche.Count == 0 && JoueurActif.CartesPossedees.Count == 0)
         { Warning("Le jeu est terminé. " + JoueurPassif.Prenom + " gagne avec " + JoueurPassif.CartesPossedees.Count + " carte(s) restantes."); return true; }
         else if (Pioche.Count == 0 && JoueurPassif.CartesPossedees.Count == 0)
@@ -495,7 +496,7 @@ public class GameManager : MonoBehaviour
                     CommencerPouvoir("Echanger à bas coût", true);
                     StartCoroutine(AttendreCibleeEchange());
                     break;
-                case 9: // Mourir Cible et Mourir
+                case 9: // Défausse deux cartes
                     StartCoroutine(MourirCiblee());
                     break;
                 case 10: // Retourner toutes les cartes j'ai essayé de raccourcir mais c'est difficile
@@ -616,7 +617,7 @@ public class GameManager : MonoBehaviour
     private void CommencerPouvoir(string texte, bool carteCiblee)
     {
         if (carteCiblee == true) { EnTrainCibleCarte = true; }
-        else { EnTrainCibleTerrain = true; ToutTerrain.transform.SetAsLastSibling(); }
+        else { EnTrainCibleTerrain = true; DossierTerrain.transform.SetAsLastSibling(); }
         EnleverBonBoutons();
         Warning(texte);
     }
@@ -634,7 +635,7 @@ public class GameManager : MonoBehaviour
         {
             TerrainCiblee = null;
             EnTrainCibleTerrain = false;
-            ToutTerrain.transform.SetAsFirstSibling();
+            DossierTerrain.transform.SetAsFirstSibling();
         }
         CarteMontree.AUtilisePouvoir = true;
         if (CarteMontree.Stats.IdPouvoir != 8 && enleverPM == true) { PMEnCours = PMEnCours - CarteMontree.Stats.CoutPouvoirVar; }

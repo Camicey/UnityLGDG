@@ -16,6 +16,8 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
         CartePlacee = null;
         if (JeuEnCours.TypePartie == "Longue")
         { GetComponent<RectTransform>().sizeDelta = new Vector2(168, 258); }
+        else
+        { GetComponent<RectTransform>().sizeDelta = new Vector2(224, 344); }
     }
 
     public void OnDrop(PointerEventData eventData) //Quand une carte est lâchée sur le terrain
