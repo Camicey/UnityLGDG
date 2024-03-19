@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Mirror;
 
-public class MainMenu : MonoBehaviour
+public class MainMenu : NetworkBehaviour
 {
+    public JoueurManager JoueurManager;
     public GameManager JeuEnCours;
     public GameObject Ecran;
     public GameObject MenuPauseUI;
@@ -20,10 +22,6 @@ public class MainMenu : MonoBehaviour
         if (MenuPauseUI != null) { MenuPauseUI.SetActive(false); }
         if (BoutonNext != null) { BoutonNext.interactable = false; }
         if (JeuEnCours != null) { JeuEnCours.FamillesChoisies.Clear(); }
-        foreach (PlaceTerrain terrain in JeuEnCours.ToutTerrain)
-        {
-            if (terrain.Id > 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(1200, 0); }
-        }
     }
 
     public void Familles()
@@ -33,13 +31,11 @@ public class MainMenu : MonoBehaviour
 
     public void Jouer()
     {
-        if (JeuEnCours.TypePartie == "Longue") { InitialiserLonguePartie(); }
-        else { InitialiserPetitePartie(); }
-        PlacerDeck(JeuEnCours.J1);
-        PlacerDeck(JeuEnCours.J2);
-        JeuEnCours.NouvellePartie();
-        Ecran.SetActive(false);
+        NetworkIdentity networkIdentity = NetworkClient.connection.identity;
+        JoueurManager = networkIdentity.GetComponent<JoueurManager>();
+        JoueurManager.CmdInstancier();
     }
+
 
     public void InitialiserLonguePartie()
     {

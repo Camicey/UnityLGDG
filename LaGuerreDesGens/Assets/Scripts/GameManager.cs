@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Mirror;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public Joueur J1;
     public Joueur J2;
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
     public string TypePartie;
     public bool EnTrainCibleCarte;
     public bool EnTrainCibleTerrain;
+    public JoueurManager JoueurManager;
 
     void Start()
     {
@@ -92,6 +94,9 @@ public class GameManager : MonoBehaviour
 
     public void Piocher() // Piocher une carte
     {
+        NetworkIdentity networkIdentity = NetworkClient.connection.identity;
+        JoueurManager = networkIdentity.GetComponent<JoueurManager>();
+
         if (Pioche.Count >= 1 && JoueurActif.APioche == false)
         {
             if (PMEnCours >= 1)
@@ -103,18 +108,19 @@ public class GameManager : MonoBehaviour
                     {
                         if (slot.availableCarteSlots == true)
                         {
-                            PMEnCours--; // Piocher coûte 1 PM
-                            AfficherPM(); // Affiche les PM mis a jour
+                            PMEnCours--;
+                            AfficherPM();
                             randCarte.gameObject.SetActive(true); // On fait apparaitre la carte
                             randCarte.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition; // On la place sur un slot disponible
-                            slot.availableCarteSlots = false; // On ne peut plus déposer de carte sur cette place
-                            slot.CartePlacee = randCarte; // On place la carte sur le slot
+                            slot.availableCarteSlots = false;
+                            slot.CartePlacee = randCarte;
                             randCarte.PlaceDeDeck = slot; // Le slot de la carte est ce slot
                             randCarte.PositionBase = slot.rectTransform.anchoredPosition;
                             randCarte.Appartenance = JoueurActif; // La carte appartient au joueur qui l'a pioché
                             JoueurActif.CartesPossedees.Add(randCarte);
                             Pioche.Remove(randCarte); // On enlève la carte de la pioche
                             JoueurActif.APioche = true;
+                            JoueurManager.CmdPiocher(randCarte.GetComponent<GameObject>());
                             return;
                         }
                     }

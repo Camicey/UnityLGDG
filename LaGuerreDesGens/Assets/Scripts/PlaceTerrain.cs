@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Mirror;
+
 public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
 {
     public int Id;

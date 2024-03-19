@@ -485,7 +485,7 @@ GameObject:
   - component: {fileID: 7749869981334372885}
   - component: {fileID: 6874003387502233363}
   m_Layer: 5
-  m_Name: Carte
+  m_Name: GrosseCarte
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

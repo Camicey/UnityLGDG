@@ -48,18 +48,8 @@ MonoBehaviour:
   Prenom: Camice
   Email: Cgazi
   CartesPossedees: []
-  Deck:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  Terrain:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  Deck: []
+  Terrain: []
   APioche: 0
 --- !u!1 &6861308526854244458
 GameObject:
@@ -109,18 +99,8 @@ MonoBehaviour:
   Prenom: Nico
   Email: BNico
   CartesPossedees: []
-  Deck:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  Terrain:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  Deck: []
+  Terrain: []
   APioche: 0
 --- !u!1 &6907544465044029789
 GameObject:
@@ -132,6 +112,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2933033208887118838}
   - component: {fileID: 6447972256912264769}
+  - component: {fileID: 8609577893640455545}
   m_Layer: 0
   m_Name: GameManagerObject
   m_TagString: Untagged
@@ -147,7 +128,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6907544465044029789}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 692.84796, y: 588.64545, z: 1.5852804}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -168,9 +149,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beef3e580cf13b24ab6b25171891f30b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   J1: {fileID: 8318169687588542366}
   J2: {fileID: 5286145329578891294}
   JoueurActif: {fileID: 8318169687588542366}
+  JoueurPassif: {fileID: 0}
   FamillesChoisies: []
   ToutesLesCartes: []
   Pioche: []
@@ -192,6 +177,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e67ceaa893d22634aa99b2babff3cf3f, type: 2}
   - {fileID: 11400000, guid: d2da5fd7765c4484eb518abeb8b09d6d, type: 2}
   - {fileID: 11400000, guid: 8a985542acafcab47b22c7479a75ce78, type: 2}
+  ToutTerrain: []
   BoutonsDeJeu:
   - {fileID: 0}
   - {fileID: 0}
@@ -204,7 +190,7 @@ MonoBehaviour:
   CarteCiblee: {fileID: 0}
   DegatCiblee: 0
   TerrainCiblee: {fileID: 0}
-  ToutTerrain: {fileID: 0}
+  DossierTerrain: {fileID: 0}
   FondColore: {fileID: 0}
   Selection: {fileID: 0}
   ImageDosCarte: {fileID: 21300000, guid: e496c4c835a76574494825f8ecf82ed1, type: 3}
@@ -215,3 +201,20 @@ MonoBehaviour:
   TypePartie: 
   EnTrainCibleCarte: 0
   EnTrainCibleTerrain: 0
+--- !u!114 &8609577893640455545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6907544465044029789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 2884269201
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0

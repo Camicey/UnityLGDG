@@ -173,6 +173,13 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         EstCachee = false;
     }
 
+    public void DeplacerCarte()
+    {
+        PlaceDeDeck.availableCarteSlots = true;
+        PlaceDeDeck.CartePlacee = null;
+        PlaceDeDeck = null;
+    }
+
     //Tout en dessous c'est pour déplacer la carte
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -201,9 +208,7 @@ public class Carte : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEnd
         }
         else if (PlaceDeDeck != null)
         {
-            PlaceDeDeck.availableCarteSlots = true;
-            PlaceDeDeck.CartePlacee = null;
-            PlaceDeDeck = null;
+            DeplacerCarte();
         }
     }
 
