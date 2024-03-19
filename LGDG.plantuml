@@ -9,6 +9,7 @@ class GrosseCarte
 class ChoixDeFamille
 class MainMenu
 class BoutonChoix
+class JoueurManager
 
 Joueur -- PlaceTerrain : < est associé à 1
 Joueur - GameManager : > participe à 1
