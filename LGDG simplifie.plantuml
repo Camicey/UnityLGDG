@@ -1,0 +1,25 @@
+@startuml DiagrammeUML
+class Joueur
+class Carte
+class GameManager
+class PlaceTerrain
+class PlaceDeck
+class CarteSettings
+class GrosseCarte
+class ChoixDeFamille
+class MainMenu
+class BoutonChoix
+
+PlaceTerrain -- Joueur : < possède 3 à 5
+PlaceTerrain -- GameManager : > participe à 1
+Carte - Joueur : < possède 0..n
+Carte - GameManager : > compose n..m
+CarteSettings -- Carte : < est lié à 1
+BoutonChoix -- GameManager : < nécessite 5
+ChoixDeFamille - MainMenu 
+MainMenu - GameManager : > lance 1
+CarteSettings - GrosseCarte : < montre 1
+PlaceDeck -- Joueur : < possède 5
+
+
+@enduml

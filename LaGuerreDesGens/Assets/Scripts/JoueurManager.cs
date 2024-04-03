@@ -75,7 +75,6 @@ public class JoueurManager : NetworkBehaviour
         {
             GameObject Derniere = Instantiate(PrefabDeck, new Vector3(-200, -200, 0), Quaternion.identity, DossierDeck.transform);
             Derniere.GetComponent<PlaceDeck>().Id = i;
-            Derniere.GetComponent<PlaceDeck>().JeuEnCours = JeuEnCours;
             if (i < 5)
             {
                 Derniere.GetComponent<PlaceDeck>().Appartenance = JeuEnCours.J1;
@@ -87,7 +86,6 @@ public class JoueurManager : NetworkBehaviour
                 JeuEnCours.J2.Deck.Add(Derniere.GetComponent<PlaceDeck>());
             }
         }
-        Debug.Log(JeuEnCours.J1.Deck.Count);
 
         if (JeuEnCours.TypePartie == "Longue") { MenuEnCours.InitialiserLonguePartie(); }
         else { MenuEnCours.InitialiserPetitePartie(); }
@@ -112,12 +110,12 @@ public class JoueurManager : NetworkBehaviour
             if (isOwned)
             {
                 //card.transform.SetParent(PlayerArea.transform, false);
-                
+
             }
             else
             {
                 //card.transform.SetParent(EnemyArea.transform, false);
-                carte.GetComponent<Carte>().MettreCarteCachee();
+                carte.GetComponent<Carte>().CacherCarte();
             }
         }
         //if the card has been "Played," send it to the DropZone. If this Client doesn't have authority over it, flip it so the player can now see the front!
@@ -126,7 +124,7 @@ public class JoueurManager : NetworkBehaviour
             //card.transform.SetParent(DropZone.transform, false);
             if (!isOwned)
             {
-                carte.GetComponent<Carte>().MettreCarteCachee();
+                carte.GetComponent<Carte>().CacherCarte();
             }
         }
     }

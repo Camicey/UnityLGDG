@@ -15,28 +15,33 @@ public class MainMenu : NetworkBehaviour
     public GameObject ImageGrandePartie;
     public static bool JeuEnPause = false;
 
-
-    // Start is called before the first frame update
-    void Start()
+    void Start() // Start is called before the first frame update
     {
         if (MenuPauseUI != null) { MenuPauseUI.SetActive(false); }
         if (BoutonNext != null) { BoutonNext.interactable = false; }
         if (JeuEnCours != null) { JeuEnCours.FamillesChoisies.Clear(); }
     }
 
-    public void Familles()
-    {
-        SceneManager.LoadScene("SampleScene");
-    }
-
     public void Jouer()
     {
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         JoueurManager = networkIdentity.GetComponent<JoueurManager>();
-        JoueurManager.CmdInstancier();
+        if (JeuEnCours.ToutesLesCartes.Count == 0)
+        { JoueurManager.CmdInstancier(); }
     }
 
-
+    public void InitialiserPetitePartie() //Place tous les terrains correctement en début de partie.
+    {
+        foreach (PlaceTerrain terrain in JeuEnCours.ToutTerrain)
+        {
+            if (terrain.Id == 0) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(560, -330); }
+            if (terrain.Id == 1) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(300, -230); }
+            if (terrain.Id == 2) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, -230); }
+            if (terrain.Id == 3) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(560, 330); }
+            if (terrain.Id == 4) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(300, 230); }
+            if (terrain.Id == 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, 230); }
+        }
+    }
     public void InitialiserLonguePartie()
     {
         ImageGrandePartie.transform.Translate(0, 0, -3f);
@@ -56,28 +61,25 @@ public class MainMenu : NetworkBehaviour
         }
     }
 
-    public void InitialiserPetitePartie()
-    {
-        foreach (PlaceTerrain terrain in JeuEnCours.ToutTerrain)
-        {
-            if (terrain.Id == 0) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(560, -330); }
-            if (terrain.Id == 1) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(300, -230); }
-            if (terrain.Id == 2) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, -230); }
-            if (terrain.Id == 3) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(560, 330); }
-            if (terrain.Id == 4) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(300, 230); }
-            if (terrain.Id == 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, 230); }
-        }
-    }
-
     public void PlacerDeck(Joueur joueur)
     {
         for (int i = 0; i < 5; i++)
         { joueur.Deck[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(-892 + i * 182, -485); }
     }
 
-    public void Quitter() { Application.Quit(); }
-
+    public void Reprendre()
+    {
+        MenuPauseUI.SetActive(false);
+        JeuEnPause = false;
+    }
+    public void Pause()
+    {
+        MenuPauseUI.SetActive(true);
+        JeuEnPause = true;
+    }
     public void RetourAuMenu() { SceneManager.LoadScene("Menu"); }
+    public void Familles() { SceneManager.LoadScene("SampleScene"); }
+    public void Quitter() { Application.Quit(); }
 
     public void MAJ()
     {
@@ -94,16 +96,4 @@ public class MainMenu : NetworkBehaviour
             else { Pause(); }
         }
     }
-
-    public void Reprendre()
-    {
-        MenuPauseUI.SetActive(false);
-        JeuEnPause = false;
-    }
-    public void Pause()
-    {
-        MenuPauseUI.SetActive(true);
-        JeuEnPause = true;
-    }
-
 }

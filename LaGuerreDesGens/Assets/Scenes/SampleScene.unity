@@ -302,7 +302,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 72690368}
         m_TargetAssemblyTypeName: ChoixDeFamille, Assembly-CSharp
-        m_MethodName: Selectionner
+        m_MethodName: SelectionnerFamille
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1427,11 +1427,11 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 628775393}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &589865950
 GameObject:
@@ -1763,7 +1763,6 @@ Transform:
   - {fileID: 472835733}
   - {fileID: 932466564}
   - {fileID: 423265285}
-  - {fileID: 519420032}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &628775394
@@ -1780,7 +1779,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneId: 211796310
   _assetId: 0
-  serverOnly: 0
+  serverOnly: 1
   visibility: 0
   hasSpawned: 0
 --- !u!1 &654410806
@@ -4377,7 +4376,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1585828101}
         m_TargetAssemblyTypeName: ChoixDeFamille, Assembly-CSharp
-        m_MethodName: Selectionner
+        m_MethodName: SelectionnerFamille
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5112,7 +5111,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1783842252}
         m_TargetAssemblyTypeName: ChoixDeFamille, Assembly-CSharp
-        m_MethodName: Selectionner
+        m_MethodName: SelectionnerFamille
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6745,6 +6744,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5286145329578891294, guid: 128e8af4f3a1a56448a251508caf514c, type: 3}
+      propertyPath: JeuEnCours
+      value: 
+      objectReference: {fileID: 887987463}
+    - target: {fileID: 5286145329578891294, guid: 128e8af4f3a1a56448a251508caf514c, type: 3}
       propertyPath: Deck.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -6813,6 +6816,10 @@ PrefabInstance:
       value: GameManagerObject
       objectReference: {fileID: 0}
     - target: {fileID: 8318169687588542366, guid: 128e8af4f3a1a56448a251508caf514c, type: 3}
+      propertyPath: JeuEnCours
+      value: 
+      objectReference: {fileID: 887987463}
+    - target: {fileID: 8318169687588542366, guid: 128e8af4f3a1a56448a251508caf514c, type: 3}
       propertyPath: Deck.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -6833,6 +6840,7 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 519420032}
   - {fileID: 628775393}
   - {fileID: 1122629051}
   - {fileID: 622660981}
