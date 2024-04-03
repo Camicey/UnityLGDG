@@ -21,9 +21,7 @@ public class GrosseCarte : MonoBehaviour
     // Start is called before the first frame update
 
     public void Start()
-    {
-        this.gameObject.SetActive(true);
-    }
+    { gameObject.SetActive(true); }
     public void Montrer()
     {
         PrenomT.text = Carte.Prenom;
@@ -37,18 +35,16 @@ public class GrosseCarte : MonoBehaviour
         TypeImageT.sprite = Carte.TypeImage;
         LiensT.text = MontrerLiens();
     }
-
     public string MontrerLiens()
     {
         string description = " ";
-        foreach (CarteSettings lien in Carte.liensvar)
+        foreach (CarteSettings lien in Carte.liensVar)
         {
             description += lien.Prenom + "\n";
         }
         if (description == " ") { description = "Personne"; }
         return description;
     }
-
     public void SeDecaler(CarteSettings carteMontree, bool montrer) //Montre la carte
     {
         if (montrer == true)

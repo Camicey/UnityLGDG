@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class PlaceDeck : MonoBehaviour
+public class PlaceDeck : NetworkBehaviour
 {
     public int Id;
     public Joueur Appartenance;
-    public GameManager JeuEnCours;
     public bool availableCarteSlots;
     public Carte CartePlacee = null;
     public RectTransform rectTransform;

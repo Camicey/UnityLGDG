@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Mirror;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public Joueur J1;
     public Joueur J2;
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
     public string TypePartie;
     public bool EnTrainCibleCarte;
     public bool EnTrainCibleTerrain;
+    public JoueurManager JoueurManager;
 
     void Start()
     {
@@ -48,7 +50,7 @@ public class GameManager : MonoBehaviour
         Tour = -1;
         CarteCiblee = null;
         TerrainCiblee = null;
-        CarteMontree = null;
+        if (CarteMontree != null) { CacherGrandeCarte(); }
         EnTrainCibleCarte = false;
         EnTrainCibleTerrain = false;
         Pioche.Clear();
@@ -92,6 +94,9 @@ public class GameManager : MonoBehaviour
 
     public void Piocher() // Piocher une carte
     {
+        NetworkIdentity networkIdentity = NetworkClient.connection.identity;
+        JoueurManager = networkIdentity.GetComponent<JoueurManager>();
+
         if (Pioche.Count >= 1 && JoueurActif.APioche == false)
         {
             if (PMEnCours >= 1)
@@ -103,18 +108,19 @@ public class GameManager : MonoBehaviour
                     {
                         if (slot.availableCarteSlots == true)
                         {
-                            PMEnCours--; // Piocher coûte 1 PM
-                            AfficherPM(); // Affiche les PM mis a jour
+                            PMEnCours--;
+                            AfficherPM();
                             randCarte.gameObject.SetActive(true); // On fait apparaitre la carte
                             randCarte.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition; // On la place sur un slot disponible
-                            slot.availableCarteSlots = false; // On ne peut plus déposer de carte sur cette place
-                            slot.CartePlacee = randCarte; // On place la carte sur le slot
+                            slot.availableCarteSlots = false;
+                            slot.CartePlacee = randCarte;
                             randCarte.PlaceDeDeck = slot; // Le slot de la carte est ce slot
                             randCarte.PositionBase = slot.rectTransform.anchoredPosition;
                             randCarte.Appartenance = JoueurActif; // La carte appartient au joueur qui l'a pioché
                             JoueurActif.CartesPossedees.Add(randCarte);
                             Pioche.Remove(randCarte); // On enlève la carte de la pioche
                             JoueurActif.APioche = true;
+                            JoueurManager.CmdPiocher(randCarte.GetComponent<GameObject>());
                             return;
                         }
                     }
@@ -187,7 +193,6 @@ public class GameManager : MonoBehaviour
         if (PMEnCours >= 1)
         {
             EnTrainCibleCarte = true;
-            //Ecran derrière, possibilité de tapper. Tant qu'on ne choisit pas
             EnleverBonBoutons();
             if (CarteMontree.Appartenance == JoueurActif) { StartCoroutine(AttendreCiblee()); }
         }
@@ -201,18 +206,15 @@ public class GameManager : MonoBehaviour
         { Warning("Cette carte vous appartient !"); }
         else if (!VerifierTerrainACote(CarteCiblee.PlaceDeTerrain.Id))
         { Warning("Cette carte est trop loin !"); }
-        else if (CarteMontree.Stats.liensvar.Contains(CarteCiblee.Stats))
+        else if (CarteMontree.Stats.liensVar.Contains(CarteCiblee.Stats))
         {
             Warning(CarteMontree.Stats.Prenom + " apperçoit " + CarteCiblee.Stats.Prenom + " et refuse de se battre.");
             PMEnCours--;
-            CarteCiblee.Retourner();
-            CarteMontree.Retourner();
+            CarteCiblee.RetournerCarte();
+            CarteMontree.RetournerCarte();
         }
         else
         {
-            PMEnCours--;
-            CarteCiblee.Retourner();
-            CarteMontree.Retourner();
             if (CarteCiblee.Stats.Type == "Robot")
             {
                 CarteCiblee.Stats.PVar = CarteCiblee.Stats.PVar - 1;
@@ -239,7 +241,9 @@ public class GameManager : MonoBehaviour
                 { CarteMontree.Mourir(); }
             }
             else { CarteCiblee.Mourir(); }
-            CarteCiblee.Montrer();
+            PMEnCours--;
+            CarteCiblee.RetournerCarte();
+            CarteMontree.RetournerCarte();
         }
         CarteCiblee = null;
         EnTrainCibleCarte = false;
@@ -421,9 +425,9 @@ public class GameManager : MonoBehaviour
                 posCarte.y = (posCarte.y - 540) * -1 + 540; // Incantation du démon pour passer de l'autre côté
                 carte.gameObject.transform.position = posCarte; // On applique la transformation de la carte
                 if (carte.EstCachee == true && carte.Appartenance == JoueurActif) // Si les cartes sont visibles
-                { carte.MettreCarteCachee(); } //Cacher carte
+                { carte.CacherCarte(); }
                 else if ((carte.EstCachee == true && carte.Appartenance == JoueurPassif) || carte.Stratege == true) // Si les cartes sont visibles
-                { carte.Montrer(); } //Montrer carte
+                { carte.Montrer(); }
             }
             var pos = terrain.gameObject.transform.position;
             pos.y = (pos.y - 540) * -1 + 540; // Transformation du terrain
@@ -454,9 +458,22 @@ public class GameManager : MonoBehaviour
     public bool ConditionDeVictoire()
     {
         if (Pioche.Count == 0 && JoueurActif.CartesPossedees.Count == 0)
-        { Warning("Le jeu est terminé. " + JoueurPassif.Prenom + " gagne avec " + JoueurPassif.CartesPossedees.Count + " carte(s) restantes."); return true; }
+        {
+            Warning("Le jeu est terminé. " + JoueurPassif.Prenom + " gagne avec " + JoueurPassif.CartesPossedees.Count + " carte(s) restantes.");
+            return true;
+        }
         else if (Pioche.Count == 0 && JoueurPassif.CartesPossedees.Count == 0)
-        { Warning("Le jeu est terminé. " + JoueurActif.Prenom + " gagne avec " + JoueurActif.CartesPossedees.Count + " carte(s) restantes."); return true; }
+        {
+            Warning("Le jeu est terminé. " + JoueurActif.Prenom + " gagne avec " + JoueurActif.CartesPossedees.Count + " carte(s) restantes.");
+            return true;
+        }
+        else if (Pioche.Count == 0 && JoueurPassif.CartesPossedees.Count == 1 && JoueurActif.CartesPossedees.Count == 1
+        && JoueurActif.CartesPossedees[0].Stats.liensVar.Contains(JoueurPassif.CartesPossedees[0].Stats)
+        && JoueurPassif.CartesPossedees[0].Stats.liensVar.Contains(JoueurActif.CartesPossedees[0].Stats))
+        {
+            Warning("Le jeu est terminé. Il y a égalité car " + JoueurPassif.CartesPossedees[0] + " et " + JoueurActif.CartesPossedees[0] + " refusent de se battre.");
+            return true;
+        }
         return false;
     }
     public void Pouvoir()
@@ -501,23 +518,23 @@ public class GameManager : MonoBehaviour
                     break;
                 case 10: // Retourner toutes les cartes j'ai essayé de raccourcir mais c'est difficile
                     foreach (PlaceTerrain terrain in JoueurActif.Terrain) // Je parcoure mon terrain
-                    { if (terrain.CartePlacee != null) { terrain.CartePlacee.Retourner(); } }
+                    { if (terrain.CartePlacee != null) { terrain.CartePlacee.RetournerCarte(); } }
                     foreach (PlaceTerrain terrain in JoueurPassif.Terrain) // Je parcoure le terrain de l'ennemi
-                    { if (terrain.CartePlacee != null) { terrain.CartePlacee.Retourner(); } }
+                    { if (terrain.CartePlacee != null) { terrain.CartePlacee.RetournerCarte(); } }
                     FinirPouvoir("Tout le monde a été découvert par " + CarteMontree.Stats.Prenom, false, true);
                     break;
                 case 11: // Retourner la Famille Rose
                     foreach (PlaceTerrain terrain in JoueurActif.Terrain)
-                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Famille == "Rose") { terrain.CartePlacee.Retourner(); } }
+                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Famille == "Rose") { terrain.CartePlacee.RetournerCarte(); } }
                     foreach (PlaceTerrain terrain in JoueurPassif.Terrain)
-                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Famille == "Rose") { terrain.CartePlacee.Retourner(); } }
+                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Famille == "Rose") { terrain.CartePlacee.RetournerCarte(); } }
                     FinirPouvoir("Toutes les cartes roses ont été découvertes par " + CarteMontree.Stats.Prenom, false, true);
                     break;
                 case 12: //Retourner Piege
                     foreach (PlaceTerrain terrain in JoueurActif.Terrain)
-                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.Retourner(); } }
+                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.RetournerCarte(); } }
                     foreach (PlaceTerrain terrain in JoueurPassif.Terrain)
-                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.Retourner(); } }
+                    { if (terrain.CartePlacee != null && terrain.CartePlacee.Stats.Type == "Piege") { terrain.CartePlacee.RetournerCarte(); } }
                     FinirPouvoir("Tout les pièges ont été découvert par " + CarteMontree.Stats.Prenom, false, true);
                     break;
                 default:
@@ -531,17 +548,17 @@ public class GameManager : MonoBehaviour
         CommencerPouvoir("Choisissez avec qui va avoir un nouveau lien.", true);
         yield return new WaitUntil(() => CarteCiblee != null);
         Carte carteAttente = CarteCiblee;
-        CarteCiblee.Retourner();
+        CarteCiblee.RetournerCarte();
         CarteCiblee = null;
         Warning("Choississez avec qui " + carteAttente.Stats.Prenom + " va avoir un lien.");
         yield return new WaitUntil(() => CarteCiblee != null);
-        CarteCiblee.Retourner();
+        CarteCiblee.RetournerCarte();
         if (CarteCiblee.Id == carteAttente.Id)
         { FinirPouvoir("L'amour de soi est toujours important.", true, false); }
-        else if (CarteCiblee.Stats.liensvar.Count < 4 && carteAttente.Stats.liensvar.Count < 4)
+        else if (CarteCiblee.Stats.liensVar.Count < 4 && carteAttente.Stats.liensVar.Count < 4)
         {
-            if (!CarteCiblee.Stats.liensvar.Contains(carteAttente.Stats)) { CarteCiblee.Stats.liensvar.Add(carteAttente.Stats); }
-            if (!carteAttente.Stats.liensvar.Contains(CarteCiblee.Stats)) { carteAttente.Stats.liensvar.Add(CarteCiblee.Stats); }
+            if (!CarteCiblee.Stats.liensVar.Contains(carteAttente.Stats)) { CarteCiblee.Stats.liensVar.Add(carteAttente.Stats); }
+            if (!carteAttente.Stats.liensVar.Contains(CarteCiblee.Stats)) { carteAttente.Stats.liensVar.Add(CarteCiblee.Stats); }
             FinirPouvoir(CarteCiblee.Stats.Prenom + " a maintenant un lien avec " + carteAttente.Stats.Prenom, true, true);
         }
         else { FinirPouvoir("On ne peut pas avoir plus de 4 liens.", true, false); }
@@ -611,7 +628,7 @@ public class GameManager : MonoBehaviour
     {
         CommencerPouvoir("Choisissez qui va perdre tous ses liens par " + CarteMontree.Stats.Prenom, true);
         yield return new WaitUntil(() => CarteCiblee != null);
-        CarteCiblee.Stats.liensvar.Clear();
+        CarteCiblee.Stats.liensVar.Clear();
         FinirPouvoir(CarteCiblee.Stats.Prenom + " a perdu tous ses liens.", true, true);
     }
     private void CommencerPouvoir(string texte, bool carteCiblee)
@@ -625,9 +642,8 @@ public class GameManager : MonoBehaviour
     {
         if (carteCiblee == true)
         {
-            CarteCiblee.Retourner();
-            CarteCiblee.Montrer();
-            CarteMontree.Retourner();
+            CarteCiblee.RetournerCarte();
+            CarteMontree.RetournerCarte();
             CarteCiblee = null;
             EnTrainCibleCarte = false;
         }

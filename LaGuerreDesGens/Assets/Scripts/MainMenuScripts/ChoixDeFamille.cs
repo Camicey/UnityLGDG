@@ -9,13 +9,12 @@ public class ChoixDeFamille : MonoBehaviour
     public string Famille;
     public MainMenu Menu;
 
-    // Start is called before the first frame update
-    void Start()
+    void Start() // Start is called before the first frame update
     {
         EstActive = false;
     }
 
-    public void Selectionner()
+    public void SelectionnerFamille() //Quand je sélectionne une famille
     {
         var colors = GetComponent<Image>().color;
 

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 [CreateAssetMenu(fileName = "New Carte", menuName = "Carte")]
 public class CarteSettings : ScriptableObject
 {
@@ -24,6 +23,6 @@ public class CarteSettings : ScriptableObject
     public string Type;
     public Sprite TypeImage;
     public List<CarteSettings> liens = new List<CarteSettings>();
-    public List<CarteSettings> liensvar = new List<CarteSettings>();
+    public List<CarteSettings> liensVar = new List<CarteSettings>();
 
 }

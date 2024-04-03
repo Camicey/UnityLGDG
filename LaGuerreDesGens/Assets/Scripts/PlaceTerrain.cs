@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
+using Mirror;
+
+public class PlaceTerrain : NetworkBehaviour, IDropHandler, IPointerDownHandler
 {
     public int Id;
     public Carte CartePlacee;
@@ -22,28 +24,21 @@ public class PlaceTerrain : MonoBehaviour, IDropHandler, IPointerDownHandler
 
     public void OnDrop(PointerEventData eventData) //Quand une carte est lâchée sur le terrain
     {
-        if (eventData.pointerDrag != null &&
-        Appartenance == JeuEnCours.JoueurActif &&
-        eventData.pointerDrag.GetComponent<Carte>().EstEnJeu == false &&
-        eventData.pointerDrag.GetComponent<Carte>().Appartenance == JeuEnCours.JoueurActif &&
-        JeuEnCours.PMEnCours >= 1)
+        Carte objetDeplace = eventData.pointerDrag.GetComponent<Carte>(); //Rend le code plus lisible
+        if (eventData.pointerDrag != null && Appartenance == JeuEnCours.JoueurActif &&
+        objetDeplace.EstEnJeu == false && objetDeplace.Appartenance == JeuEnCours.JoueurActif && JeuEnCours.PMEnCours >= 1)
         {
-            eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
-            eventData.pointerDrag.GetComponent<Carte>().EstEnJeu = true; //Si je pose la carte sur la place, on pose un true
-            CartePlacee = eventData.pointerDrag.GetComponent<Carte>();
-            eventData.pointerDrag.GetComponent<Carte>().PlaceDeTerrain = this;
-            if (JeuEnCours.JoueurActif.Terrain[0] != null && this == JeuEnCours.JoueurActif.Terrain[0]) { CartePlacee.EstCachee = false; }
+            objetDeplace.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
+            objetDeplace.EstEnJeu = true; //Si je pose la carte sur la place, on pose un true
+            CartePlacee = objetDeplace;
+            objetDeplace.PlaceDeTerrain = this;
+            if (JeuEnCours.JoueurActif.Terrain[0] != null && this == JeuEnCours.JoueurActif.Terrain[0])
+            { CartePlacee.EstCachee = false; }
             else { CartePlacee.EstCachee = true; }
             if (JeuEnCours.TypePartie == "Longue") // La carte se met à la taille de la case
             { CartePlacee.gameObject.transform.localScale = Vector3.one * 0.75f; }
             JeuEnCours.PMEnCours -= 1;
             JeuEnCours.AfficherPM();
-        }
-        else
-        {
-            Debug.Log(eventData.pointerDrag + (Appartenance == JeuEnCours.JoueurActif).ToString() +
-            eventData.pointerDrag.GetComponent<Carte>().EstEnJeu +
-            (eventData.pointerDrag.GetComponent<Carte>().Appartenance == JeuEnCours.JoueurActif).ToString() + (JeuEnCours.PMEnCours >= 1).ToString());
         }
     }
     public void OnPointerDown(PointerEventData eventData)
