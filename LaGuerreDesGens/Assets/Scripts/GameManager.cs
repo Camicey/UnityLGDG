@@ -471,7 +471,7 @@ public class GameManager : NetworkBehaviour
         && JoueurActif.CartesPossedees[0].Stats.liensVar.Contains(JoueurPassif.CartesPossedees[0].Stats)
         && JoueurPassif.CartesPossedees[0].Stats.liensVar.Contains(JoueurActif.CartesPossedees[0].Stats))
         {
-            Warning("Le jeu est terminé. Il y a égalité car " + JoueurPassif.CartesPossedees[0] + " et " + JoueurActif.CartesPossedees[0] + " refusent de se battre.");
+            Warning("Le jeu est terminé. Il y a égalité car " + JoueurPassif.CartesPossedees[0].Stats.Prenom + " et " + JoueurActif.CartesPossedees[0].Stats.Prenom + " ont un lien et refusent de se battre.");
             return true;
         }
         return false;

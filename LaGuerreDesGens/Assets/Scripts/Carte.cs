@@ -117,7 +117,7 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
     {
         if (EstEnJeu == false)
         {
-            gameObject.transform.Translate(90, 180, 1.5f);
+            gameObject.transform.Translate(86, 176, 1.5f);
             gameObject.transform.localScale = Vector3.one * 1.3f;
             rectTransform.SetAsLastSibling(); // Met la carte devant les autres
         }
@@ -126,7 +126,7 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
     {
         if (EstEnJeu == false)
         {
-            gameObject.transform.Translate(-90, -180, 0f);
+            gameObject.transform.Translate(-86, -176, 0f);
             gameObject.transform.localScale = Vector3.one * 1f;
         }
     }
