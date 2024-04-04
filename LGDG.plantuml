@@ -32,7 +32,7 @@ class Joueur {
     List <> Deck : List<PlaceDeck>
     List <> Terrain : List<PlaceTerrain>
     List <> CartesPossedees : List<Carte>
-    Connecte : bool
+    APioche : bool
 
     Start()
     TrouverStratege()
@@ -43,7 +43,6 @@ class PlaceTerrain {
     CartePlacee : Carte
     JeuEnCours : GameManager
     Appartenance : Joueur
-    ImageTerre : sprite
 
     Start()
     Initialiser()
@@ -54,29 +53,29 @@ class PlaceTerrain {
 class PlaceDeck {
     Id : int
     Appartenance : Joueur
-    JeuEnCours : GameManager
     availableCarteSlots : bool
     CartePlacee : Carte
     rectTransform : RectTransform
 }
 
 class GameManager {
-    Joueur1 : Joueur
-    Joueur2 : Joueur
+    J1 : Joueur
+    J2 : Joueur
     JoueurActif : Joueur
     JoueurPassif : Joueur
     List<> FamillesChoisies : List<string>
     List<> ToutesLesCartes : List<Carte>
     List<> Pioche : List<Carte>
     List<> Defausse : List<Carte>
-    List<> CartesMontrables : List<Settings>
+    List<> CartesMontrables : List<CarteSettings>
+    List<> ToutTerrain : List<PlaceTerrain>
     List<> BoutonsDeJeu : List<BoutonChoix>
     grosseCarte : GrosseCarte
     CarteMontree : Carte
     CarteCiblee : Carte
     DegatCiblee : int
     TerrainCiblee : PlaceTerrain
-    ToutTerrain : GameObject 
+    DossierTerrain : GameObject 
     FondColore : GameObject 
     Selection : Image 
     ImageDosCarte : Sprite 
@@ -88,6 +87,7 @@ class GameManager {
     TypePartie : string
     EnTrainCibleCarte : bool
     EnTrainCibleTerrain : bool
+    JoueurManager : JoueurManager
 
     Start()
     NouvellePartie()
@@ -111,7 +111,7 @@ class GameManager {
     CacherGrandeCarte()
     MontrerGrandeCarte(Carte carteMontree)
     ConditionDeVictoire()
-    InitialiserCartes() 
+    VerifierEgalite()
     Pouvoir()
     CreerLien()
     Teleporter()
@@ -169,26 +169,36 @@ class Carte {
     JeuEnCours : GameManager
     PlaceDeDeck : PlaceDeck
     PlaceDeTerrain : PlaceTerrain
-    ImageOriginale : Sprite
 
-    Start()
+    PrenomT : string
+    ImageT : sprite
+    PMT : text
+    PVT : text
+    PAT : text
+    CoutPouvoirT : text
+    
+    FamilleImageT : sprite
+    TypeImageT : sprite
+    LienT : text
+
+    Montrer()
+    MontrerLiens()
+    Commencer()
     Initialiser()
+    Mourir()
     Agrandir()
     Retrecir()
     MettreBonBoutons()
-    Mourir()
-    Retourner()
+    CacherCarte()
+    RetournerCarte()
     OnBeginDrag()
     OnDrag()
     OnEndDrag()
     OnPointerDown()
-    OnDrop()
-
 }
 
 class GrosseCarte {
     Carte : CarteSettings 
-    IdT : Text
     Text: Text
     ImageT : Image
     PMT : Text
@@ -200,6 +210,7 @@ class GrosseCarte {
     TypeImageT : Image
     LiensT: Text
 
+    Start()
     Montrer()
     MontrerLiens()
     SeDecaler(CarteSettings, Bool)
@@ -211,11 +222,12 @@ class ChoixDeFamille {
     Menu : MainMenu 
 
     Start()
-    Selectionner()
+    SelectionnerFamille()
     SelectionnerTypePartie()
 }
 
 class MainMenu {
+    JoueurManager : JoueurManager
     JeuEnCours : GameManager 
     Ecran : GameObject 
     MenuPauseUI : GameObject 
@@ -225,15 +237,17 @@ class MainMenu {
     JeuEnPause : bool
 
     Start()
-    Famille()
     Jouer()
+    InitialiserPetitePartie()
     InitialiserLonguePartie()
+    PlacerDeck(Joueur)
     Quitter()
-    RetourAuMenu()
-    MAJ()
-    Update()
     Reprendre()
     Pause()
+    RetourAuMenu()
+    Famille()
+    MAJ()
+    Update()
 }
 
 class BoutonChoix {
@@ -244,6 +258,23 @@ class BoutonChoix {
     Start()
     Montrer()
     Cacher()
+}
+
+class JoueurManager {
+    PrefabCarte : GameObject
+    PrefabTerrain : GameObject
+    PrefabDeck : GameObject
+    JeuEnCours : GameManager
+    MenuEnCours : MainMenu
+    DossierCarte : GameObject
+    DossierDeck : GameObject
+    Canvas : Canvas
+
+    OnStartClient()
+    OnStartServer()
+    CmdInstancier()
+    CmdPiocher(GameObject)
+    RpcShowCard(GameObject, string)
 }
 
 @enduml

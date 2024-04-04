@@ -472,7 +472,6 @@ public class GameManager : NetworkBehaviour
             Warning("Le jeu est terminé. Il y a égalité car " + JoueurPassif.CartesPossedees[0].Stats.Prenom + " et " + JoueurActif.CartesPossedees[0].Stats.Prenom + " ont un lien et refusent de se battre.");
             return true;
         }
-        Debug.Log(VerifierEgalite());
         return false;
     }
 
@@ -482,9 +481,6 @@ public class GameManager : NetworkBehaviour
         {
             foreach (Carte carteLien in JoueurActif.CartesPossedees)
             {
-                Debug.Log(!carteLien.Stats.liensVar.Contains(carte.Stats));
-                Debug.Log(carteLien.Stats.Prenom);
-                Debug.Log(carte.Stats.Prenom);
                 if (!carteLien.Stats.liensVar.Contains(carte.Stats))
                 { return false; }
             }
@@ -493,9 +489,6 @@ public class GameManager : NetworkBehaviour
         {
             foreach (Carte carteLien in JoueurPassif.CartesPossedees)
             {
-                Debug.Log(!carteLien.Stats.liensVar.Contains(carte.Stats));
-                Debug.Log(carteLien.Stats.Prenom);
-                Debug.Log(carte.Stats.Prenom);
                 if (!carteLien.Stats.liensVar.Contains(carte.Stats))
                 { return false; }
             }

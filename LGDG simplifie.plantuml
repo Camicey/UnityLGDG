@@ -10,16 +10,17 @@ class ChoixDeFamille
 class MainMenu
 class BoutonChoix
 
-PlaceTerrain -- Joueur : < possède 3 à 5
+Joueur - PlaceTerrain : > possède 3 à 5
 PlaceTerrain -- GameManager : > participe à 1
 Carte - Joueur : < possède 0..n
 Carte - GameManager : > compose n..m
 CarteSettings -- Carte : < est lié à 1
-BoutonChoix -- GameManager : < nécessite 5
+GameManager - BoutonChoix : > nécessite 5
 ChoixDeFamille - MainMenu 
 MainMenu - GameManager : > lance 1
-CarteSettings - GrosseCarte : < montre 1
+GrosseCarte - CarteSettings : > montre 1
 PlaceDeck -- Joueur : < possède 5
-
+JoueurManager - GameManager
+MainMenu - JoueurManager
 
 @enduml
