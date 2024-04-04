@@ -467,15 +467,42 @@ public class GameManager : NetworkBehaviour
             Warning("Le jeu est terminé. " + JoueurActif.Prenom + " gagne avec " + JoueurActif.CartesPossedees.Count + " carte(s) restantes.");
             return true;
         }
-        else if (Pioche.Count == 0 && JoueurPassif.CartesPossedees.Count == 1 && JoueurActif.CartesPossedees.Count == 1
-        && JoueurActif.CartesPossedees[0].Stats.liensVar.Contains(JoueurPassif.CartesPossedees[0].Stats)
-        && JoueurPassif.CartesPossedees[0].Stats.liensVar.Contains(JoueurActif.CartesPossedees[0].Stats))
+        else if (Pioche.Count == 0 && VerifierEgalite())
         {
             Warning("Le jeu est terminé. Il y a égalité car " + JoueurPassif.CartesPossedees[0].Stats.Prenom + " et " + JoueurActif.CartesPossedees[0].Stats.Prenom + " ont un lien et refusent de se battre.");
             return true;
         }
+        Debug.Log(VerifierEgalite());
         return false;
     }
+
+    public bool VerifierEgalite()
+    {
+        foreach (Carte carte in JoueurPassif.CartesPossedees)
+        {
+            foreach (Carte carteLien in JoueurActif.CartesPossedees)
+            {
+                Debug.Log(!carteLien.Stats.liensVar.Contains(carte.Stats));
+                Debug.Log(carteLien.Stats.Prenom);
+                Debug.Log(carte.Stats.Prenom);
+                if (!carteLien.Stats.liensVar.Contains(carte.Stats))
+                { return false; }
+            }
+        }
+        foreach (Carte carte in JoueurActif.CartesPossedees)
+        {
+            foreach (Carte carteLien in JoueurPassif.CartesPossedees)
+            {
+                Debug.Log(!carteLien.Stats.liensVar.Contains(carte.Stats));
+                Debug.Log(carteLien.Stats.Prenom);
+                Debug.Log(carte.Stats.Prenom);
+                if (!carteLien.Stats.liensVar.Contains(carte.Stats))
+                { return false; }
+            }
+        }
+        return true;
+    }
+
     public void Pouvoir()
     {
         if (CarteMontree.AUtilisePouvoir == true)
