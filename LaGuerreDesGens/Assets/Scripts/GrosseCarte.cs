@@ -18,11 +18,9 @@ public class GrosseCarte : MonoBehaviour
     public Image TypeImageT;
     public Text LiensT;
 
-    // Start is called before the first frame update
-
     public void Start()
     { gameObject.SetActive(true); }
-    public void Montrer()
+    public void Montrer() //Cette fonction permet de montrer la carte et de mettre à jour ses informations
     {
         PrenomT.text = Carte.Prenom;
         ImageT.sprite = Carte.Image;
@@ -45,7 +43,7 @@ public class GrosseCarte : MonoBehaviour
         if (description == " ") { description = "Personne"; }
         return description;
     }
-    public void SeDecaler(CarteSettings carteMontree, bool montrer) //Montre la carte
+    public void SeDecaler(CarteSettings carteMontree, bool montrer) //Montre ou cache la carte en fonction du bool
     {
         if (montrer == true)
         {

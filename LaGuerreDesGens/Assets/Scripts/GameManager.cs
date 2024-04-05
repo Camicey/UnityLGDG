@@ -12,16 +12,16 @@ public class GameManager : NetworkBehaviour
     public Joueur JoueurActif;
     public Joueur JoueurPassif;
     public List<string> FamillesChoisies = new List<string>();
-    public List<Carte> ToutesLesCartes = new List<Carte>();
+    public List<Carte> ToutesLesCartes = new List<Carte>(); //Toutes les cartes s'y trouvent
     public List<Carte> Pioche = new List<Carte>();
     public List<Carte> Defausse = new List<Carte>();
-    public List<CarteSettings> CartesMontrable = new List<CarteSettings>();
+    public List<CarteSettings> CartesMontrable = new List<CarteSettings>(); //Toutes les cartes settings s'y trouvent
     public List<PlaceTerrain> ToutTerrain = new List<PlaceTerrain>();
     public List<BoutonChoix> BoutonsDeJeu = new List<BoutonChoix>();
     public GrosseCarte grosseCarte;
     public Carte CarteMontree;
     public Carte CarteCiblee; //Carte ciblée dans une attaque
-    public int DegatCiblee;
+    public int DegatCiblee; //Degat infligé pour la carte ciblée
     public PlaceTerrain TerrainCiblee;
     public GameObject DossierTerrain;
     public GameObject FondColore;
@@ -30,7 +30,7 @@ public class GameManager : NetworkBehaviour
     public int Tour { get; protected set; }
     public float PMEnCours;
     public Text PMEnCoursTexte;
-    public Text WarningTexte;
+    public Text WarningTexte; //Texte en haut à gauche qui décrit les actions des joueurs
     public Text ActionEnCoursTexte;
     public string TypePartie;
     public bool EnTrainCibleCarte;
@@ -283,7 +283,7 @@ public class GameManager : NetworkBehaviour
         TerrainCiblee = null;
         CacherGrandeCarte();
     }
-    public void Retirer()
+    public void Retirer() //On remet une carte dans son deck
     {
         if (PMEnCours >= 1)
         {
@@ -455,7 +455,7 @@ public class GameManager : NetworkBehaviour
         if (CarteMontree.Appartenance != JoueurActif) { Selection.color = Color.red; }
         else { Selection.color = Color.blue; } // Change la couleur en fonction d'ennemi (rouge) ou allié (bleu)
     }
-    public bool ConditionDeVictoire()
+    public bool ConditionDeVictoire() //Vérifie si le jeu est terminé
     {
         if (Pioche.Count == 0 && JoueurActif.CartesPossedees.Count == 0)
         {
@@ -563,6 +563,7 @@ public class GameManager : NetworkBehaviour
         }
         ConditionDeVictoire();
     }
+    //Tous les pouvoirs
     public IEnumerator CreerLien()
     {
         CommencerPouvoir("Choisissez avec qui va avoir un nouveau lien.", true);
@@ -651,14 +652,14 @@ public class GameManager : NetworkBehaviour
         CarteCiblee.Stats.liensVar.Clear();
         FinirPouvoir(CarteCiblee.Stats.Prenom + " a perdu tous ses liens.", true, true);
     }
-    private void CommencerPouvoir(string texte, bool carteCiblee)
+    private void CommencerPouvoir(string texte, bool carteCiblee) //Utilisé à chaque début de pouvoir
     {
         if (carteCiblee == true) { EnTrainCibleCarte = true; }
         else { EnTrainCibleTerrain = true; DossierTerrain.transform.SetAsLastSibling(); }
         EnleverBonBoutons();
         Warning(texte);
     }
-    private void FinirPouvoir(string texte, bool carteCiblee, bool enleverPM)
+    private void FinirPouvoir(string texte, bool carteCiblee, bool enleverPM) //Utilisé à chaque fin de pouvoir
     {
         if (carteCiblee == true)
         {

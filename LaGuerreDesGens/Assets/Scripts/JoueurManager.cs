@@ -33,16 +33,19 @@ public class JoueurManager : NetworkBehaviour
         base.OnStartServer();
     }
 
-    //Commands are methods requested by Clients to run on the Server
+    //Les Commands sont les méthodes requêtées par les Clients pour les jouer sur le Server
     [Command]
     public void CmdInstancier()
     {
+        //D'abbord, on fait en sorte que tout soit vide pour éviter les bugs
         JeuEnCours.ToutesLesCartes.Clear();
         JeuEnCours.J1.Terrain.Clear();
         JeuEnCours.J2.Terrain.Clear();
         JeuEnCours.J1.Deck.Clear();
         JeuEnCours.J2.Deck.Clear();
         JeuEnCours.ToutTerrain.Clear();
+
+        //Puis on procède aux instanciations
         foreach (CarteSettings CarteS in JeuEnCours.CartesMontrable) //On instancie les cartes
         {
             GameObject Derniere = Instantiate(PrefabCarte, new Vector3(-500, -500, 0), Quaternion.identity, DossierCarte.transform);
@@ -71,6 +74,7 @@ public class JoueurManager : NetworkBehaviour
             JeuEnCours.ToutTerrain.Add(Derniere.GetComponent<PlaceTerrain>());
             if (i > 5) { Derniere.GetComponent<PlaceTerrain>().GetComponent<RectTransform>().anchoredPosition = new Vector2(1200, 0); }
         }
+
         for (int i = 0; i < 10; i++) //On instancie les decks
         {
             GameObject Derniere = Instantiate(PrefabDeck, new Vector3(-200, -200, 0), Quaternion.identity, DossierDeck.transform);
@@ -104,29 +108,32 @@ public class JoueurManager : NetworkBehaviour
     [ClientRpc]
     void RpcShowCard(GameObject carte, string type)
     {
-        //if the card has been "Dealt," determine whether this Client has authority over it, and send it either to the PlayerArea or EnemyArea, accordingly. For the latter, flip it so the player can't see the front!
+        //Si la carte est "Dealt," il détermine si le client à une autorité dessus, et l'envoie au bon endroit en fonction.
         if (type == "Dealt")
         {
             if (isOwned)
             {
-                //card.transform.SetParent(PlayerArea.transform, false);
-
+                //Déposer la carte dans le deck allié
             }
             else
             {
-                //card.transform.SetParent(EnemyArea.transform, false);
+                //Déposer la carte dans le deck ennemi
                 carte.GetComponent<Carte>().CacherCarte();
             }
         }
-        //if the card has been "Played," send it to the DropZone. If this Client doesn't have authority over it, flip it so the player can now see the front!
+        //Si la carte est jouée, et qu'elle a autorité dessus on la met chez l'allié, sinon, on la met chez l'ennemi
         else if (type == "Played")
         {
-            //card.transform.SetParent(DropZone.transform, false);
-            if (!isOwned)
+            if (isOwned)
             {
+                //Dépose la carte du côté allié
+            }
+            else
+            {
+                //Dépose la carte du côté ennemi 
                 carte.GetComponent<Carte>().CacherCarte();
             }
         }
-    }
 
+    }
 }

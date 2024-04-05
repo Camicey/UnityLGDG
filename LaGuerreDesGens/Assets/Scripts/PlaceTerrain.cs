@@ -41,7 +41,7 @@ public class PlaceTerrain : NetworkBehaviour, IDropHandler, IPointerDownHandler
             JeuEnCours.AfficherPM();
         }
     }
-    public void OnPointerDown(PointerEventData eventData)
+    public void OnPointerDown(PointerEventData eventData) //Quand je clique dessus
     {
         if (JeuEnCours.EnTrainCibleTerrain == true) { JeuEnCours.TerrainCiblee = this; }
     }

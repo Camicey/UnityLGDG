@@ -22,7 +22,7 @@ public class MainMenu : NetworkBehaviour
         if (JeuEnCours != null) { JeuEnCours.FamillesChoisies.Clear(); }
     }
 
-    public void Jouer()
+    public void Jouer() //Commence le jeu, utilisé qu'une fois, utilise le multijoueur
     {
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         JoueurManager = networkIdentity.GetComponent<JoueurManager>();
@@ -30,7 +30,7 @@ public class MainMenu : NetworkBehaviour
         { JoueurManager.CmdInstancier(); }
     }
 
-    public void InitialiserPetitePartie() //Place tous les terrains correctement en début de partie.
+    public void InitialiserPetitePartie() //Place tous les terrains correctement en début de petite partie.
     {
         foreach (PlaceTerrain terrain in JeuEnCours.ToutTerrain)
         {
@@ -42,7 +42,7 @@ public class MainMenu : NetworkBehaviour
             if (terrain.Id == 5) { terrain.GetComponent<RectTransform>().anchoredPosition = new Vector2(820, 230); }
         }
     }
-    public void InitialiserLonguePartie()
+    public void InitialiserLonguePartie() //Pareil pour une grande partie
     {
         ImageGrandePartie.transform.Translate(0, 0, -3f);
         foreach (PlaceTerrain terrain in JeuEnCours.ToutTerrain)
@@ -61,18 +61,18 @@ public class MainMenu : NetworkBehaviour
         }
     }
 
-    public void PlacerDeck(Joueur joueur)
+    public void PlacerDeck(Joueur joueur) //Place les decks aux bons endroits
     {
         for (int i = 0; i < 5; i++)
         { joueur.Deck[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(-892 + i * 182, -485); }
     }
 
-    public void Reprendre()
+    public void Reprendre() //Reprendre la partie après une pause
     {
         MenuPauseUI.SetActive(false);
         JeuEnPause = false;
     }
-    public void Pause()
+    public void Pause() //Mettre le jeu en pause
     {
         MenuPauseUI.SetActive(true);
         JeuEnPause = true;
@@ -81,16 +81,16 @@ public class MainMenu : NetworkBehaviour
     public void Familles() { SceneManager.LoadScene("SampleScene"); }
     public void Quitter() { Application.Quit(); }
 
-    public void MAJ()
+    public void MAJ() //A chaque fois il vérifie que les conditions pour débuter la partie sont remplie
     {
         if (JeuEnCours.FamillesChoisies.Count == 2 && JeuEnCours.TypePartie != "")
         { BoutonNext.interactable = true; }
         else { BoutonNext.interactable = false; }
     }
 
-    public void Update()
+    public void Update() //Fonction qui s'execute à chaque frame
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape)) //Si on appuie sur la touche echap
         {
             if (JeuEnPause) { Reprendre(); }
             else { Pause(); }

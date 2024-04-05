@@ -167,7 +167,7 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
 
     //Tout en dessous c'est pour déplacer la carte, ce sont des fonctions implémentées par Unity de base
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public void OnBeginDrag(PointerEventData eventData) //Quand je commence à déplacer la carte
     {
         if (GetComponent<Carte>().EstEnJeu == false)
         {
@@ -175,12 +175,12 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
             canvasGroup.blocksRaycasts = false;
         }
     }
-    public void OnDrag(PointerEventData eventData)
+    public void OnDrag(PointerEventData eventData) //Quand je déplace la carte
     {
         if (GetComponent<Carte>().EstEnJeu == false)
         { rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor; }
     }
-    public void OnEndDrag(PointerEventData eventData)
+    public void OnEndDrag(PointerEventData eventData) //Quand je finis de déplacer la carte
     {
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
@@ -195,7 +195,7 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
             PlaceDeDeck = null;
         }
     }
-    public void OnPointerDown(PointerEventData eventData)
+    public void OnPointerDown(PointerEventData eventData) //Quand je clique sur la carte
     {
         if (JeuEnCours.EnTrainCibleCarte == true && EstEnJeu == true) { JeuEnCours.CarteCiblee = this; }
         else if (EstEnJeu == true && (EstCachee == false || JeuEnCours.JoueurActif == Appartenance)) //Si elle est montré ou qu'elle nous appartient

@@ -15,15 +15,16 @@ Joueur -- PlaceTerrain : < est associé à 1
 Joueur - GameManager : > participe à 1
 Carte - Joueur : < possède 0..n
 Carte - GameManager : > compose n..m
-CarteSettings -- Carte : < est lié à 1
-BoutonChoix - GameManager
+CarteSettings - Carte : < est lié à 1
+BoutonChoix -- GameManager
 ChoixDeFamille - MainMenu 
 MainMenu - GameManager
 GrosseCarte - Carte
 PlaceDeck - Joueur
 PlaceDeck -- GameManager
 PlaceTerrain -- GameManager
-
+JoueurManager - GameManager
+MainMenu - JoueurManager
 
 class Joueur {
     Id : int
