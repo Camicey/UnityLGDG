@@ -37,6 +37,14 @@ public class GameManager : NetworkBehaviour
     public bool EnTrainCibleTerrain;
     public JoueurManager JoueurManager;
 
+    public override void OnStartServer()
+    {
+        Debug.Log("Server Started!");
+    }
+    public override void OnStopServer()
+    {
+        Debug.Log("Server Stopped!");
+    }
     void Start()
     {
         Pioche.Clear();

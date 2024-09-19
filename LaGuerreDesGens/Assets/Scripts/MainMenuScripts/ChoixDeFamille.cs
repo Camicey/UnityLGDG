@@ -33,7 +33,6 @@ public class ChoixDeFamille : MonoBehaviour
         GetComponent<Image>().color = colors;
         Menu.MAJ();
     }
-
     public void SelectionnerTypePartie()
     {
         var colors = GetComponent<Image>().color;

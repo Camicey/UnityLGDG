@@ -17,6 +17,14 @@ public class JoueurManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+    }
+
+    [Server]
+    public override void OnStartServer()
+    {
+        base.OnStartServer(); //Je sais pas pourquoi il est là
+        Debug.Log("Player has been spawned on the server!");
+
         GameObject Derniere = GameObject.Find("GameManagerObject");
         JeuEnCours = Derniere.GetComponent<GameManager>();
         Derniere = GameObject.Find("CanvaMenus");
@@ -27,10 +35,17 @@ public class JoueurManager : NetworkBehaviour
         Canvas = Derniere.GetComponent<Canvas>();
     }
 
-    [Server]
-    public override void OnStartServer()
+
+    public override void OnClientConnect(NetworkConnection conn)
     {
-        base.OnStartServer();
+        Debug.Log("Connected to Server!");
+    }
+
+
+
+    public override void OnClientDisconnect(NetworkConnection conn)
+    {
+        Debug.Log("Disconnected from Server!");
     }
 
     //Les Commands sont les méthodes requêtées par les Clients pour les jouer sur le Server
@@ -49,6 +64,7 @@ public class JoueurManager : NetworkBehaviour
         foreach (CarteSettings CarteS in JeuEnCours.CartesMontrable) //On instancie les cartes
         {
             GameObject Derniere = Instantiate(PrefabCarte, new Vector3(-500, -500, 0), Quaternion.identity, DossierCarte.transform);
+            //NetworkServer.Spawn(Derniere); Chat GPT m'a dit de faire ça mais...
             Derniere.GetComponent<Carte>().Stats = CarteS;
             Derniere.GetComponent<Carte>().JeuEnCours = JeuEnCours;
             Derniere.GetComponent<Carte>().canvas = Canvas;
@@ -105,7 +121,7 @@ public class JoueurManager : NetworkBehaviour
         RpcShowCard(carte, "Dealt");
     }
 
-    [ClientRpc]
+    [ClientRpc] //Permet au serveur de communiquer un changement à tous les clients
     void RpcShowCard(GameObject carte, string type)
     {
         //Si la carte est "Dealt," il détermine si le client à une autorité dessus, et l'envoie au bon endroit en fonction.

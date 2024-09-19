@@ -75,7 +75,7 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
     public void Initialiser()
     {
         Id = Stats.Id;
-        Stats.PVar = Stats.PV;
+        Stats.PVar = Stats.PV; //Mettre sur CarteSettings
         Stats.PouvoirVar = Stats.Pouvoir;
         Stats.IdPouvoirVar = Stats.IdPouvoir;
         Stats.CoutPouvoirVar = Stats.CoutPouvoir;
@@ -97,16 +97,17 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
     }
     public void Mourir()
     {
+        Appartenance.CartesPossedees.Remove(this); // On enlève la carte du joueur a qui il appartient 
         if (Stats.IdPouvoir == 13 && JeuEnCours.Pioche.Count != 0)
         {
-            Initialiser();
+            this.Initialiser();
             JeuEnCours.Warning(Stats.Prenom + " est retourné dans la pioche.");
         }
         else
         {
             JeuEnCours.Warning(Stats.Prenom + " est mort(e).");
-            Appartenance.CartesPossedees.Remove(this); // On enlève la carte du joueur a qui il appartient 
             Appartenance = null;
+            EstEnJeu = false;
             gameObject.transform.Translate(0, 1500, 0f);
             PlaceDeTerrain.CartePlacee = null;
             PlaceDeTerrain = null;

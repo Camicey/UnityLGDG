@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Mirror;
+using TMPro;
 
 public class MainMenu : NetworkBehaviour
 {
@@ -14,18 +15,29 @@ public class MainMenu : NetworkBehaviour
     public Button BoutonNext;
     public GameObject ImageGrandePartie;
     public static bool JeuEnPause = false;
+    public TMP_InputField ZoneNomJ1; // Référence à l'InputField UI
+    public string NomJ1 = "";
+    public TMP_InputField ZoneNomJ2; // Référence à l'InputField UI
+    public string NomJ2 = "";
+
+    public void OnTextChanged1() { NomJ1 = ZoneNomJ1.text; MAJ(); }
+    public void OnTextChanged2() { NomJ2 = ZoneNomJ2.text; MAJ(); }
 
     void Start() // Start is called before the first frame update
     {
         if (MenuPauseUI != null) { MenuPauseUI.SetActive(false); }
         if (BoutonNext != null) { BoutonNext.interactable = false; }
         if (JeuEnCours != null) { JeuEnCours.FamillesChoisies.Clear(); }
+        NomJ1 = "";
+        NomJ2 = "";
     }
 
     public void Jouer() //Commence le jeu, utilisé qu'une fois, utilise le multijoueur
     {
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         JoueurManager = networkIdentity.GetComponent<JoueurManager>();
+        JeuEnCours.J1.Prenom = NomJ1;
+        JeuEnCours.J2.Prenom = NomJ2;
         if (JeuEnCours.ToutesLesCartes.Count == 0)
         { JoueurManager.CmdInstancier(); }
     }
@@ -83,7 +95,7 @@ public class MainMenu : NetworkBehaviour
 
     public void MAJ() //A chaque fois il vérifie que les conditions pour débuter la partie sont remplie
     {
-        if (JeuEnCours.FamillesChoisies.Count == 2 && JeuEnCours.TypePartie != "")
+        if (JeuEnCours.FamillesChoisies.Count == 2 && JeuEnCours.TypePartie != "" && NomJ1 != "" && NomJ2 != "" && NomJ1 != NomJ2)
         { BoutonNext.interactable = true; }
         else { BoutonNext.interactable = false; }
     }
