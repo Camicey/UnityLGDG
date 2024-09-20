@@ -116,7 +116,7 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
 
     public void Agrandir() // Agrandir la carte. 
     {
-        if (EstEnJeu == false)
+        if (EstEnJeu == false && Appartenance == JeuEnCours.JoueurActif)
         {
             gameObject.transform.Translate(86, 176, 1.5f);
             gameObject.transform.localScale = Vector3.one * 1.3f;
@@ -125,7 +125,7 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
     }
     public void Retrecir() //Rétrécir la carte. 
     {
-        if (EstEnJeu == false)
+        if (EstEnJeu == false && Appartenance == JeuEnCours.JoueurActif)
         {
             gameObject.transform.Translate(-86, -176, 0f);
             gameObject.transform.localScale = Vector3.one * 1f;
@@ -166,11 +166,21 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
         }
     }
 
+    public void ChangerTourCarte(bool actif)
+    {
+        var posCarte = gameObject.transform.position;
+        posCarte.y = (posCarte.y - 540) * -1 + 540; // Incantation du démon pour passer de l'autre côté
+        gameObject.transform.position = posCarte; // On applique la transformation de la carte
+        if (actif == true)
+        { Montrer(); }
+        else { CacherCarte(); }
+    }
+
     //Tout en dessous c'est pour déplacer la carte, ce sont des fonctions implémentées par Unity de base
 
     public void OnBeginDrag(PointerEventData eventData) //Quand je commence à déplacer la carte
     {
-        if (GetComponent<Carte>().EstEnJeu == false)
+        if (GetComponent<Carte>().EstEnJeu == false && Appartenance == JeuEnCours.JoueurActif)
         {
             canvasGroup.alpha = .7f; // Opacité de la carte quand je clique dessus
             canvasGroup.blocksRaycasts = false;
@@ -178,18 +188,18 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
     }
     public void OnDrag(PointerEventData eventData) //Quand je déplace la carte
     {
-        if (GetComponent<Carte>().EstEnJeu == false)
+        if (GetComponent<Carte>().EstEnJeu == false && Appartenance == JeuEnCours.JoueurActif)
         { rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor; }
     }
     public void OnEndDrag(PointerEventData eventData) //Quand je finis de déplacer la carte
     {
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
-        if (GetComponent<Carte>().EstEnJeu == false)
+        if (GetComponent<Carte>().EstEnJeu == false && Appartenance == JeuEnCours.JoueurActif)
         {
             rectTransform.anchoredPosition = PositionBase;
         }
-        else if (PlaceDeDeck != null)
+        else if (PlaceDeDeck != null && Appartenance == JeuEnCours.JoueurActif)
         {
             PlaceDeDeck.availableCarteSlots = true;
             PlaceDeDeck.CartePlacee = null;

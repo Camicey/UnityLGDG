@@ -16,9 +16,9 @@ public class MainMenu : NetworkBehaviour
     public GameObject ImageGrandePartie;
     public static bool JeuEnPause = false;
     public TMP_InputField ZoneNomJ1; // Référence à l'InputField UI
-    public string NomJ1 = "";
+    public string NomJ1;
     public TMP_InputField ZoneNomJ2; // Référence à l'InputField UI
-    public string NomJ2 = "";
+    public string NomJ2;
 
     public void OnTextChanged1() { NomJ1 = ZoneNomJ1.text; MAJ(); }
     public void OnTextChanged2() { NomJ2 = ZoneNomJ2.text; MAJ(); }
@@ -28,11 +28,15 @@ public class MainMenu : NetworkBehaviour
         if (MenuPauseUI != null) { MenuPauseUI.SetActive(false); }
         if (BoutonNext != null) { BoutonNext.interactable = false; }
         if (JeuEnCours != null) { JeuEnCours.FamillesChoisies.Clear(); }
-        NomJ1 = "";
-        NomJ2 = "";
+        NomJ1 = "Camice"; //Normalement vide
+        NomJ2 = "Nico"; //Normalement vide
+        JeuEnCours.TypePartie = "Petite"; //Normalement vide
+        JeuEnCours.FamillesChoisies.Add("Rose"); //Normalement pas là
+        JeuEnCours.FamillesChoisies.Add("Jaune");
+        MAJ(); //Pas la
     }
 
-    public void Jouer() //Commence le jeu, utilisé qu'une fois, utilise le multijoueur
+    public void Jouer() //Commence le jeu, utilisé qu'une fois, utilise le multijoueur //Normalement nulle part dans le code
     {
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         JoueurManager = networkIdentity.GetComponent<JoueurManager>();

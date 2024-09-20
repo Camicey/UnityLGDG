@@ -48,7 +48,6 @@ public class GameManager : NetworkBehaviour
     void Start()
     {
         Pioche.Clear();
-        TypePartie = "";
     }
     public void NouvellePartie() // On récupèrera les joueurs et familles
     {
@@ -128,7 +127,7 @@ public class GameManager : NetworkBehaviour
                             JoueurActif.CartesPossedees.Add(randCarte);
                             Pioche.Remove(randCarte); // On enlève la carte de la pioche
                             JoueurActif.APioche = true;
-                            JoueurManager.CmdPiocher(randCarte.GetComponent<GameObject>());
+                            //JoueurManager.CmdPiocher(randCarte.GetComponent<GameObject>());
                             return;
                         }
                     }
@@ -146,16 +145,15 @@ public class GameManager : NetworkBehaviour
         JoueurActif.APioche = false;
         Tour++;
         if (CarteMontree != null) { CacherGrandeCarte(); }
-
         foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
         {
-            slot.gameObject.SetActive(false);
-            if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(false); }
+            slot.ChangerTourDeck(false);
+            if (slot.CartePlacee != null) { slot.CartePlacee.ChangerTourCarte(false); }
         }
         foreach (PlaceDeck slot in JoueurPassif.Deck) // On montre le deck de l'autre joueur
         {
-            slot.gameObject.SetActive(true);
-            if (slot.CartePlacee != null) { slot.CartePlacee.gameObject.SetActive(true); }
+            slot.ChangerTourDeck(true);
+            if (slot.CartePlacee != null) { slot.CartePlacee.ChangerTourCarte(true); }
         }
         foreach (Carte carte in ToutesLesCartes)
         {

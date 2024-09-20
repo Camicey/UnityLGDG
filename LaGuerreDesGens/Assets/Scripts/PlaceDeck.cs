@@ -18,4 +18,9 @@ public class PlaceDeck : NetworkBehaviour
         CartePlacee = null;
     }
 
+    public void ChangerTourDeck(bool actif)
+    {
+        gameObject.SetActive(actif);
+    }
+
 }

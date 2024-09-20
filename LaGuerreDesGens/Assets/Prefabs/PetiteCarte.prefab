@@ -341,6 +341,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7334f73a9b3899469202f33a9cef964, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   canvas: {fileID: 0}
   rectTransform: {fileID: 0}
   Id: 0
@@ -355,7 +358,6 @@ MonoBehaviour:
   JeuEnCours: {fileID: 0}
   PlaceDeDeck: {fileID: 0}
   PlaceDeTerrain: {fileID: 0}
-  ImageOriginale: {fileID: 21300000, guid: 7fe19ec77744ce447b74045b00c30fe1, type: 3}
   PrenomT: {fileID: 955697519629127651}
   ImageT: {fileID: 307250391097804860}
   PMT: {fileID: 7300952562347909174}
@@ -447,7 +449,7 @@ MonoBehaviour:
   interpolatePosition: 1
   interpolateRotation: 1
   interpolateScale: 1
-  coordinateSpace: 0
+  coordinateSpace: 1
   sendIntervalMultiplier: 1
   timelineOffset: 0
   showGizmos: 0
