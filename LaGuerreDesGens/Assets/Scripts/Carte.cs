@@ -142,6 +142,7 @@ public class Carte : NetworkBehaviour, IPointerDownHandler, IBeginDragHandler, I
         PouvoirT.text = " ";
         CoutPouvoirT.text = " ";
         FamilleImageT.sprite = JeuEnCours.ImageDosCarte;
+
         TypeImageT.enabled = false;
         LiensT.text = " ";
     }

@@ -113,42 +113,60 @@ public class JoueurManager : NetworkBehaviour
         MenuEnCours.Ecran.SetActive(false);
     }
 
-    /* 
     [Command]
-    public void CmdPiocher(GameObject carte)
+    public void CmdPiocher()
     {
-        RpcShowCard(carte, "Dealt");
-    }
-       
-             [ClientRpc] //Permet au serveur de communiquer un changement à tous les clients
-             void RpcShowCard(GameObject carte, string type)
-             {
-                 //Si la carte est "Dealt," il détermine si le client à une autorité dessus, et l'envoie au bon endroit en fonction.
-                 if (type == "Dealt")
-                 {
-                     if (isOwned)
-                     {
-                         //Déposer la carte dans le deck allié
-                     }
-                     else
-                     {
-                         //Déposer la carte dans le deck ennemi
-                         carte.GetComponent<Carte>().CacherCarte();
-                     }
-                 }
-                 //Si la carte est jouée, et qu'elle a autorité dessus on la met chez l'allié, sinon, on la met chez l'ennemi
-                 else if (type == "Played")
-                 {
-                     if (isOwned)
-                     {
-                         //Dépose la carte du côté allié
-                     }
-                     else
-                     {
-                         //Dépose la carte du côté ennemi 
-                         carte.GetComponent<Carte>().CacherCarte();
-                     }
-                 }
+        //RpcShowCard(carte, "Dealt");
 
-     }*/
+        Carte randCarte = JeuEnCours.Pioche[Random.Range(0, JeuEnCours.Pioche.Count)];
+        foreach (PlaceDeck slot in JeuEnCours.JoueurActif.Deck)
+        {
+            if (slot.availableCarteSlots == true)
+            {
+                randCarte.gameObject.SetActive(true); // On fait apparaitre la carte
+                randCarte.rectTransform.anchoredPosition = slot.rectTransform.anchoredPosition; // On la place sur un slot disponible
+                slot.availableCarteSlots = false;
+                slot.CartePlacee = randCarte;
+                randCarte.PlaceDeDeck = slot; // Le slot de la carte est ce slot
+                randCarte.PositionBase = slot.rectTransform.anchoredPosition;
+                randCarte.Appartenance = JeuEnCours.JoueurActif; // La carte appartient au joueur qui l'a pioché
+                JeuEnCours.JoueurActif.CartesPossedees.Add(randCarte);
+                JeuEnCours.Pioche.Remove(randCarte); // On enlève la carte de la pioche
+                JeuEnCours.JoueurActif.APioche = true;
+            }
+        }
+    }
+
+
+    [ClientRpc] //Permet au serveur de communiquer un changement à tous les clients
+    void RpcShowCard(GameObject carte, string type)
+    {
+        //Si la carte est "Dealt," il détermine si le client à une autorité dessus, et l'envoie au bon endroit en fonction.
+        if (type == "Dealt")
+        {
+            if (isOwned)
+            {
+                //Déposer la carte dans le deck allié
+            }
+            else
+            {
+                //Déposer la carte dans le deck ennemi
+                carte.GetComponent<Carte>().CacherCarte();
+            }
+        }
+        //Si la carte est jouée, et qu'elle a autorité dessus on la met chez l'allié, sinon, on la met chez l'ennemi
+        else if (type == "Played")
+        {
+            if (isOwned)
+            {
+                //Dépose la carte du côté allié
+            }
+            else
+            {
+                //Dépose la carte du côté ennemi 
+                carte.GetComponent<Carte>().CacherCarte();
+            }
+        }
+
+    }
 }

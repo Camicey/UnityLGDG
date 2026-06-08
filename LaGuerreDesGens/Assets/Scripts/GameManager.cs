@@ -24,6 +24,7 @@ public class GameManager : NetworkBehaviour
     public int DegatCiblee; //Degat infligé pour la carte ciblée
     public PlaceTerrain TerrainCiblee;
     public GameObject DossierTerrain;
+    public GameObject EcranJoueurSuivant;
     public GameObject FondColore;
     public Image Selection;
     public Sprite ImageDosCarte;
@@ -48,13 +49,15 @@ public class GameManager : NetworkBehaviour
     void Start()
     {
         Pioche.Clear();
+        EcranJoueurSuivant.gameObject.SetActive(false);
     }
     public void NouvellePartie() // On récupèrera les joueurs et familles
     {
-        if (JoueurActif == J2) { ChangerDeTour(); }
+        if (JoueurActif == J2) { ChangerDeTourClassique(); }
         JoueurActif = J1; // Ce sera une création de joueur à la place
         JoueurPassif = J2;
         Tour = -1;
+        EcranJoueurSuivant.gameObject.SetActive(false);
         CarteCiblee = null;
         TerrainCiblee = null;
         if (CarteMontree != null) { CacherGrandeCarte(); }
@@ -89,20 +92,22 @@ public class GameManager : NetworkBehaviour
             Piocher();
             JoueurActif.APioche = false;
         }
-        ChangerDeTour();
+        ChangerDeTourClassique();
         PMEnCours = 4;
         for (int i = 0; i < 4; i++)
         {
             Piocher();
             JoueurActif.APioche = false;
         }
-        ChangerDeTour();
+        ChangerDeTourClassique();
+
     }
 
     public void Piocher() // Piocher une carte
     {
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         JoueurManager = networkIdentity.GetComponent<JoueurManager>();
+        JoueurManager.CmdPiocher();
 
         if (Pioche.Count >= 1 && JoueurActif.APioche == false)
         {
@@ -127,7 +132,7 @@ public class GameManager : NetworkBehaviour
                             JoueurActif.CartesPossedees.Add(randCarte);
                             Pioche.Remove(randCarte); // On enlève la carte de la pioche
                             JoueurActif.APioche = true;
-                            //JoueurManager.CmdPiocher(randCarte.GetComponent<GameObject>());
+                            JoueurManager.CmdPiocher();
                             return;
                         }
                     }
@@ -138,6 +143,9 @@ public class GameManager : NetworkBehaviour
         }
         else { Warning("Vous ne pouvez piocher qu'une fois par tour."); }
     }
+
+
+
     public void ChangerDeTour()
     {
         if (ConditionDeVictoire() == true) { SceneManager.LoadScene("Menu"); } // On fait quitter le jeu s'il est terminé
@@ -150,6 +158,12 @@ public class GameManager : NetworkBehaviour
             slot.ChangerTourDeck(false);
             if (slot.CartePlacee != null) { slot.CartePlacee.ChangerTourCarte(false); }
         }
+
+        EcranJoueurSuivant.gameObject.SetActive(true);
+    }
+    public void ChangerDeTour2()
+    {
+
         foreach (PlaceDeck slot in JoueurPassif.Deck) // On montre le deck de l'autre joueur
         {
             slot.ChangerTourDeck(true);
@@ -170,7 +184,48 @@ public class GameManager : NetworkBehaviour
         else if (Tour > 2 && JoueurActif.TrouverStratege() != null) { PMEnCours = JoueurActif.TrouverStratege().Stats.PM; } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
         else if (Tour > 2 && JoueurActif.TrouverStratege() == null) { PMEnCours = 4; Piocher(); StartCoroutine(ChoixDeStratege()); }
         AfficherPM();
+
+        EcranJoueurSuivant.gameObject.SetActive(false);
     }
+
+    public void ChangerDeTourClassique()
+    {
+        if (ConditionDeVictoire() == true) { SceneManager.LoadScene("Menu"); } // On fait quitter le jeu s'il est terminé
+        Warning("On change de tour : " + Tour.ToString() + ". C'est au tour de : " + JoueurPassif.Prenom);
+        JoueurActif.APioche = false;
+        Tour++;
+        if (CarteMontree != null) { CacherGrandeCarte(); }
+        foreach (PlaceDeck slot in JoueurActif.Deck) //On cache le deck qu'on a
+        {
+            slot.ChangerTourDeck(false);
+            if (slot.CartePlacee != null) { slot.CartePlacee.ChangerTourCarte(false); }
+        }
+
+
+        foreach (PlaceDeck slot in JoueurPassif.Deck) // On montre le deck de l'autre joueur
+        {
+            slot.ChangerTourDeck(true);
+            if (slot.CartePlacee != null) { slot.CartePlacee.ChangerTourCarte(true); }
+        }
+        foreach (Carte carte in ToutesLesCartes)
+        {
+            carte.AUtilisePouvoir = false;
+            if (carte.Immobile > 0) { carte.Immobile--; } // C'est pour le pouvoir 4
+        }
+        EchangeDeTerrain(JoueurActif);
+        EchangeDeTerrain(JoueurPassif);
+
+        if (Tour % 2 == 0) { JoueurActif = J2; JoueurPassif = J1; } // Changement de joueur
+        else { JoueurActif = J1; JoueurPassif = J2; }
+        EnleverBonBoutons();
+        if (Tour == 1 || Tour == 2) { PMEnCours = 3; StartCoroutine(ChoixDeStratege()); }
+        else if (Tour > 2 && JoueurActif.TrouverStratege() != null) { PMEnCours = JoueurActif.TrouverStratege().Stats.PM; } // POUR L'instant !! Après le stratège bouge mais on verra ca plus tard
+        else if (Tour > 2 && JoueurActif.TrouverStratege() == null) { PMEnCours = 4; Piocher(); StartCoroutine(ChoixDeStratege()); }
+        AfficherPM();
+        EcranJoueurSuivant.gameObject.SetActive(false);
+    }
+
+
     IEnumerator ChoixDeStratege() // Me permet d'arrêter l'action tant qu'il n'a pas choisit de stratège
     {
         FondColore.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 320);
